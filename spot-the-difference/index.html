@@ -88,7 +88,8 @@
   <div class="card hidden" id="overlay">
     <h2 id="ovTitle">최종 클리어!</h2>
     <p id="ovText"></p>
-    <button class="btn" id="againBtn">다시 하기</button>
+    <button class="btn" id="homeBtn">홈으로</button>
+    <button class="btn ghost" id="againBtn">다시 하기</button>
   </div>
 </div>
 
@@ -133,11 +134,12 @@ const STAGES=[
      {id:'cactus',x:40,y:230,draw(g,r){if(!r)return;g.fillStyle='#2f7a4a';g.fillRect(37,210,6,34);g.fillRect(28,220,10,5);g.fillRect(28,214,5,10);}}
    ]},
  { sky:['#050718','#10163a'], ground:'#080a1c',
-   clutter(g,lv){ dots(g,3,60+lv*20,0,0,W,H,'#e8ecff',1); g.save();g.globalAlpha=.5;g.fillStyle='#7a86c8';g.beginPath();g.moveTo(-20,300);g.lineTo(360,20);g.lineTo(360,70);g.lineTo(-20,300);g.closePath();g.fill();g.restore(); },
+   clutter(g,lv){ dots(g,3,60+lv*20,0,0,W,H,'#e8ecff',1); g.save();g.globalAlpha=.5;g.fillStyle='#7a86c8';g.beginPath();g.moveTo(-20,300);g.lineTo(360,20);g.lineTo(360,70);g.lineTo(-20,300);g.closePath();g.fill();g.restore();
+     g.fillStyle='#03040e';g.beginPath();g.moveTo(0,300);g.lineTo(0,258);g.quadraticCurveTo(170,236,340,258);g.lineTo(340,300);g.closePath();g.fill(); },
    diffs:[
      {id:'shoot',x:110,y:90,draw(g,r){if(r)return;g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.moveTo(90,72);g.lineTo(126,102);g.stroke();circ(g,126,102,3,'#fff');}},
      {id:'moon',x:280,y:60,draw(g,r){circ(g,280,60,14,r?'#a8b6ff':'#f6e7a6');}},
-     {id:'hill',x:170,y:224,draw(g,r){g.fillStyle='#03040e';g.beginPath();g.moveTo(0,300);g.lineTo(0,r?248:262);g.quadraticCurveTo(170,r?204:238,340,262);g.lineTo(340,300);g.closePath();g.fill();}},
+     {id:'planet',x:250,y:195,draw(g,r){if(r)return;circ(g,250,195,11,'#d9a86a');g.strokeStyle='#e8cfa0';g.lineWidth=2;g.save();g.translate(250,195);g.rotate(-0.4);g.beginPath();g.ellipse(0,0,20,6,0,0,7);g.stroke();g.restore();}},
      {id:'bigstar',x:60,y:70,draw(g,r){star(g,60,70,r?6:3,'#fff');}},
      {id:'cluster',x:230,y:130,draw(g,r){if(!r)return;for(let i=0;i<5;i++)g.fillRect(224+i*4,128+(i%2)*4,2,2);g.fillStyle='#ffd76a';}}
    ]},
@@ -209,6 +211,7 @@ function setPause(p){
 function exitToStart(){
   running=false;paused=false;
   el('pause').classList.add('hidden');
+  el('overlay').classList.add('hidden');
   cvL.style.visibility=cvR.style.visibility='visible';
   el('game').classList.add('hidden');el('start').classList.remove('hidden');
 }
@@ -217,6 +220,7 @@ document.addEventListener('keydown',e=>{
 });
 el('resumeBtn').onclick=()=>setPause(false);
 el('exitBtn').onclick=exitToStart;
+el('homeBtn').onclick=exitToStart;
 
 function loop(now){
   if(!running||paused)return;const dt=Math.min(50,now-last);last=now;time-=dt/1000;
