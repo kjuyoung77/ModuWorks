@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>세계 국가 도감</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
+  :root{--paper:#f4f2ea;--ink:#1c1b18;--muted:#8b8575;--faint:#b7b1a2;--line:#e2ded1;--card:#fbfaf4;--sel:#1c1b18;--star:#b5773a;--sans:'Noto Sans KR',sans-serif;--disp:'Space Grotesk','Noto Sans KR',sans-serif;--radius:14px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:960px;margin:auto;padding:0 26px}
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:5;background:rgba(244,242,234,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
+  .back{font-family:var(--disp);font-size:.82rem;font-weight:700;letter-spacing:.04em;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+  .back:hover{color:var(--muted)}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .topbar .brand{font-family:var(--disp);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .langsw{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+  .langsw button{font-family:var(--disp);font-weight:700;font-size:.7rem;letter-spacing:.06em;border:0;background:transparent;color:var(--muted);padding:5px 11px;cursor:pointer;transition:.15s}
+  .langsw button.on{background:var(--sel);color:var(--paper)}
+  /* hero */
+  .hero{position:relative;height:min(56vh,460px);background:var(--ink) center/cover no-repeat;display:flex;align-items:flex-end;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(20,18,14,.82) 0%,rgba(20,18,14,.15) 55%,rgba(20,18,14,.35) 100%)}
+  .hero.loading{background:linear-gradient(135deg,#2a2823,#14120e)}
+  .hero-in{position:relative;z-index:2;width:100%}
+  .hero-in .wrap{padding-bottom:30px}
+  .hero .flag{height:38px;width:auto;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.4);display:block;margin-bottom:14px}
+  .hero h1{color:#fff;font-weight:900;font-size:clamp(2.2rem,7vw,4.2rem);line-height:1;letter-spacing:-.03em;margin:0}
+  .hero .sub{font-family:var(--disp);color:rgba(255,255,255,.82);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;margin-top:12px}
+  .hero .credit{position:absolute;bottom:10px;right:22px;z-index:2;font-family:var(--disp);font-size:.64rem;letter-spacing:.03em;color:rgba(255,255,255,.55)}
+  /* breadcrumb */
+  .crumb{font-family:var(--disp);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:24px 0 0}
+  .crumb a{text-decoration:none}.crumb a:hover{color:var(--ink)}
+  .crumb .sep{margin:0 8px;color:var(--faint)}
+  .crumb b{color:var(--ink)}
+  /* sections */
+  section.blk{padding:34px 0;border-bottom:1px solid var(--line)}
+  .lbl{font-family:var(--disp);font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+  .lead-txt{font-size:1.18rem;line-height:1.7;letter-spacing:-.01em;max-width:60ch}
+  .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:0 40px}
+  .fact{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .fact .k{font-family:var(--disp);color:var(--muted);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;flex:0 0 auto;padding-top:3px}
+  .fact .v{text-align:right;font-weight:600}
+  .place{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start}
+  .place .pimg{width:100%;aspect-ratio:4/3;border-radius:12px;background:var(--card) center/cover no-repeat;border:1px solid var(--line)}
+  .place h3{margin:0 0 8px;font-size:1.35rem;font-weight:900;letter-spacing:-.01em}
+  .place p{margin:0;color:#3a382f;line-height:1.75}
+  .place .plink{font-family:var(--disp);font-size:.78rem;font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px;display:inline-block;margin-top:14px}
+  .place .plink:hover{opacity:.6}
+  .fun-card{background:var(--ink);color:var(--paper);border-radius:var(--radius);padding:26px 28px;line-height:1.75;font-size:1.02rem}
+  .fun-card .lbl{color:rgba(255,255,255,.55)}
+  /* reactions + fav */
+  .actions{display:flex;gap:12px;flex-wrap:wrap}
+  .rbtn{flex:1;min-width:150px;padding:14px;border:1px solid var(--line);border-radius:12px;background:transparent;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);transition:.15s}
+  .rbtn:hover{border-color:var(--ink)}
+  .rbtn.on{background:var(--sel);border-color:var(--sel);color:var(--paper)}
+  .rbtn.wish.on{background:var(--star);border-color:var(--star);color:#fff}
+  .rbtn.fav.on{background:var(--star);border-color:var(--star);color:#fff}
+  .authline{font-family:var(--disp);font-size:.72rem;letter-spacing:.03em;color:var(--muted);margin-top:14px}
+  /* comments */
+  .cmt-list{margin-top:4px}
+  .cmt{padding:14px 0;border-bottom:1px solid var(--line)}
+  .cmt .who{font-weight:700;font-size:.92rem}
+  .cmt .when{color:var(--muted);font-size:.74rem;margin-left:7px}
+  .cmt .txt{font-size:.95rem;margin-top:5px;white-space:pre-wrap;word-break:break-word;line-height:1.7}
+  .cmt .del{float:right;background:none;border:0;color:var(--muted);font-size:.74rem;cursor:pointer}
+  .cmt .del:hover{color:#b23b2e}
+  .cmt-empty{color:var(--muted);font-size:.92rem;padding:22px 0;text-align:center}
+  .cmt-form{margin-top:16px;display:grid;gap:8px}
+  .cmt-form input,.cmt-form textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:.95rem;background:var(--card);color:var(--ink)}
+  .cmt-form textarea{resize:vertical;min-height:52px}
+  .cmt-form button{padding:13px;border:0;border-radius:10px;background:var(--ink);color:var(--paper);font-weight:700;cursor:pointer;font-family:inherit;justify-self:start;padding-left:28px;padding-right:28px}
+  .cmt-form button:hover{opacity:.88}
+  .cmt-off{color:var(--muted);font-size:.9rem;padding:20px;text-align:center;line-height:1.7;background:var(--card);border:1px solid var(--line);border-radius:12px}
+  /* related */
+  .rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+  .relc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-decoration:none;transition:.15s;display:block}
+  .relc:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .relc .flag{height:22px;width:auto;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.15);display:block}
+  .relc h4{margin:12px 0 2px;font-size:1.02rem;font-weight:700}
+  .relc .en{font-family:var(--disp);color:var(--muted);font-size:.68rem;letter-spacing:.04em;text-transform:uppercase}
+  .end{font-family:var(--disp);text-align:center;color:var(--faint);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:34px 0 56px}
+  .notfound{text-align:center;padding:120px 20px}
+  .notfound h1{font-size:2rem;margin:0 0 12px}
+  .notfound a{font-weight:700}
+  @media(max-width:640px){
+    .wrap{padding:0 18px}
+    .facts{grid-template-columns:1fr;gap:0}
+    .place{grid-template-columns:1fr}
+    .place .pimg{aspect-ratio:16/9}
+  }
+</style>
+</head>
+<body>
+  <div class="topbar"><div class="wrap">
+    <a class="back" id="backLink" href="index.html">← 세계 국가 도감</a>
+    <div class="topbar-right">
+      <div class="langsw" id="langsw"><button data-l="ko">KO</button><button data-l="en">EN</button></div>
+      <span class="brand">World Atlas</span>
+    </div>
+  </div></div>
+  <div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="data.js"></script>
+<script>
+const code = new URLSearchParams(location.search).get('c');
+const c = code && countryByCode(code);
+const app = document.getElementById('app');
+let me = null;
+let THISVIEWS = null;   // 이 나라 조회수(백엔드)
+
+const $langsw = document.getElementById('langsw');
+$langsw.querySelectorAll("button").forEach(b => b.onclick = () => { if(b.dataset.l===LANG) return; setLang(b.dataset.l); rerender(); });
+function applyLangBits(){
+  document.documentElement.lang = LANG;
+  $langsw.querySelectorAll("button").forEach(b => b.classList.toggle('on', b.dataset.l===LANG));
+  document.getElementById('backLink').textContent = t('back');
+}
+
+if(!c){
+  applyLangBits();
+  document.title = t('docTitle');
+  app.innerHTML = `<div class="notfound">
+    <h1>${t('nfTitle')}</h1>
+    <p style="color:var(--muted)">${t('nfDesc')}</p>
+    <p style="margin-top:18px"><a href="index.html">${t('nfBack')}</a></p>
+  </div>`;
+} else {
+  start();
+}
+
+function start(){
+  applyLangBits();
+  document.title = `${L.name(c)} · ${t('docTitle')}`;
+  render();
+  loadHero();
+  initAuth();
+}
+// 언어 전환 시: DOM 재구성 + 히어로 다시 로드 + (로그인 상태면) 카운트/댓글 재표시
+function rerender(){
+  applyLangBits();
+  document.title = `${L.name(c)} · ${t('docTitle')}`;
+  render();
+  loadHero();
+  if(me){ loadMarks(); loadComments(); }
+  else { updateViewsFact(); }
+}
+
+function render(){
+  const related = COUNTRIES.filter(x => x.region===c.region && x.id!==c.id);
+  app.innerHTML = `
+    <div class="hero loading" id="hero">
+      <div class="hero-in"><div class="wrap">
+        <img class="flag" src="flags/${code}.svg" alt="${esc(L.name(c))}">
+        <h1>${esc(L.name(c))}</h1>
+        <div class="sub">${esc(LANG==='en'?c.name:c.nameEn)} · ${esc(regionLabel(c.region))}</div>
+      </div></div>
+      <span class="credit" id="heroCredit"></span>
+    </div>
+
+    <div class="wrap">
+      <nav class="crumb">
+        <a href="index.html">${t('crumbAtlas')}</a><span class="sep">/</span>
+        <a href="index.html?region=${encodeURIComponent(c.region)}">${esc(regionLabel(c.region))}</a><span class="sep">/</span>
+        <b>${esc(L.name(c))}</b>
+      </nav>
+
+      <section class="blk">
+        <p class="lead-txt">${esc(L.desc(c))}</p>
+      </section>
+
+      <section class="blk">
+        <div class="lbl">${t('ovOverview')}</div>
+        <div class="facts">
+          <div class="fact"><span class="k">${t('kCapital')}</span><span class="v">${esc(L.capital(c))}</span></div>
+          <div class="fact"><span class="k">${t('kPop')}</span><span class="v">${fmtPop(c.population)}</span></div>
+          <div class="fact"><span class="k">${t('kArea')}</span><span class="v">${fmtArea(c.area)}</span></div>
+          <div class="fact"><span class="k">${t('kLang')}</span><span class="v">${esc(L.languages(c))}</span></div>
+          <div class="fact"><span class="k">${t('kRel')}</span><span class="v">${esc(L.religion(c))}</span></div>
+          <div class="fact"><span class="k">${t('kCur')}</span><span class="v">${esc(L.currency(c))}</span></div>
+          <div class="fact"><span class="k">${t('kDial')}</span><span class="v">${esc(c.dial)}</span></div>
+          <div class="fact"><span class="k">${t('kViews')}</span><span class="v" id="factViews">…</span></div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <div class="lbl">${t('ovMark')}</div>
+        <div class="actions">
+          <button class="rbtn" id="bVisited" onclick="toggleMark('visited')">✈️ ${t('visited')} <b id="cVisited">0</b></button>
+          <button class="rbtn wish" id="bWish" onclick="toggleMark('wish')">🧡 ${t('wish')} <b id="cWish">0</b></button>
+          <button class="rbtn fav" id="bFav" onclick="toggleFav()">${t('markFavOff')}</button>
+        </div>
+        <div class="authline" id="authline">${t('beChecking')}</div>
+      </section>
+
+      <section class="blk">
+        <div class="lbl">${t('ovLandmark')}</div>
+        <div class="place">
+          <div class="pimg" id="placeImg"></div>
+          <div>
+            <h3 id="placeName">${esc(L.landmark(c))}</h3>
+            <p id="placeText" style="color:var(--muted)">${t('loadingWiki')}</p>
+            <a class="plink" id="placeLink" href="https://${LANG}.wikipedia.org/wiki/${encodeURIComponent(L.landmark(c))}" target="_blank" rel="noopener">${t('wikiMore')}</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="blk">
+        <div class="fun-card">
+          <div class="lbl">${t('ovKnow')}</div>
+          ${esc(L.fun(c))}
+        </div>
+      </section>
+
+      <section class="blk">
+        <div class="lbl">${t('ovComments')}</div>
+        <div class="cmt-list" id="cmtList"><div class="cmt-empty">${sb ? t('cmtLoading') : t('cmtOffList')}</div></div>
+        ${ sb ? `<div class="cmt-form">
+            <input id="cmtNick" maxlength="20" placeholder="${t('cmtNick')}" value="${esc(localStorage.getItem('nick')||'')}">
+            <textarea id="cmtBody" maxlength="300" placeholder="${t('cmtBody')}"></textarea>
+            <button onclick="postComment()">${t('cmtPost')}</button>
+          </div>` : `<div class="cmt-off">${t('cmtOff')}</div>` }
+      </section>
+
+      <section class="blk">
+        <div class="lbl">${t('ovMoreIn')} ${esc(regionLabel(c.region))}</div>
+        <div class="rel">
+          ${related.map(r => { const rc=flagCode(r.flag); return `<a class="relc" href="country.html?c=${rc}">
+            <img class="flag" src="flags/${rc}.svg" alt="${esc(L.name(r))}">
+            <h4>${esc(L.name(r))}</h4><div class="en">${esc(LANG==='en'?r.name:r.nameEn)}</div>
+          </a>`; }).join("")}
+        </div>
+      </section>
+
+      <div class="end"><a href="index.html" style="text-decoration:none">${t('backToAll')}</a></div>
+    </div>`;
+  updateViewsFact();
+}
+
+function updateViewsFact(){
+  const el = document.getElementById('factViews'); if(!el) return;
+  el.textContent = (THISVIEWS != null) ? (LANG==='en' ? `${THISVIEWS.toLocaleString()} ${t('viewsShort')}` : `${THISVIEWS.toLocaleString()}회`) : (sb ? '…' : '—');
+}
+
+// ===== 히어로/명소 이미지 (위키백과: 현재 언어) =====
+async function loadHero(){
+  let w = await fetchWiki(L.landmark(c), LANG);
+  if(!w || !w.img) { const w2 = await fetchWiki(L.name(c), LANG); if(w2 && w2.img){ w = { ...w2, title: L.landmark(c), extract: (w && w.extract) || w2.extract }; } }
+  const hero = document.getElementById('hero'); if(!hero) return;
+  const pos = c.heroPos || 'center 30%';   // 상징 피사체가 프레임에 잘 들어오게(디렉터 피드백)
+  if(w && w.img){
+    const im = new Image();
+    im.onload = () => { hero.style.backgroundImage = `url("${w.img}")`; hero.style.backgroundPosition = pos; hero.classList.remove('loading'); };
+    im.src = w.img;
+    const hc = document.getElementById('heroCredit'); if(hc) hc.textContent = t('photoCredit');
+    const pimg = document.getElementById('placeImg'); if(pimg){ pimg.style.backgroundImage = `url("${w.img}")`; pimg.style.backgroundPosition = pos; }
+  }
+  const pt = document.getElementById('placeText');
+  if(pt){ pt.textContent = (w && w.extract) ? w.extract : (LANG==='en' ? `${L.landmark(c)}, the landmark of ${L.name(c)}.` : `${c.name}의 대표 명소인 ${c.landmark}입니다.`); pt.style.color = "#3a382f"; }
+}
+
+// ===== 백엔드 (Supabase) =====
+async function initAuth(){
+  const line = document.getElementById('authline');
+  if(!sb){ if(line) line.textContent = t('beOffCountry'); updateViewsFact(); return; }
+  try{
+    let { data:{ user } } = await sb.auth.getUser();
+    if(!user){ const r = await sb.auth.signInAnonymously(); if(r.error) throw r.error; user = r.data.user; }
+    me = user.id;
+    if(line) line.textContent = t('beOn');
+    await logView(code, me);        // 이 나라 조회 기록(세션 1회)
+    await loadMarks();
+    loadComments();
+  }catch(e){ if(line) line.textContent = t('beFail') + e.message; updateViewsFact(); }
+}
+async function loadMarks(){
+  const [all, mine, fav, vc] = await Promise.all([
+    sb.from('country_marks').select('kind').eq('code', code),
+    sb.from('country_marks').select('kind').eq('code', code).eq('user_id', me),
+    sb.from('favorites').select('code').eq('code', code).eq('user_id', me),
+    getViewCounts()
+  ]);
+  const cnt = {visited:0, wish:0}; (all.data||[]).forEach(r => cnt[r.kind]!==undefined && cnt[r.kind]++);
+  const bv=document.getElementById('cVisited'), bw=document.getElementById('cWish');
+  if(bv) bv.textContent = cnt.visited; if(bw) bw.textContent = cnt.wish;
+  const myset = new Set((mine.data||[]).map(r=>r.kind));
+  const eV=document.getElementById('bVisited'), eW=document.getElementById('bWish');
+  if(eV) eV.classList.toggle('on', myset.has('visited'));
+  if(eW) eW.classList.toggle('on', myset.has('wish'));
+  const fon = (fav.data||[]).length>0;
+  const bf = document.getElementById('bFav'); if(bf){ bf.classList.toggle('on', fon); bf.innerHTML = fon ? t('markFavOn') : t('markFavOff'); }
+  THISVIEWS = (vc && vc[code]) || 0; updateViewsFact();
+}
+async function toggleMark(kind){
+  if(!sb){ alert(t('beNeed')); return; }
+  const on = document.getElementById(kind==='visited'?'bVisited':'bWish').classList.contains('on');
+  if(on){ await sb.from('country_marks').delete().match({user_id:me, code, kind}); }
+  else  { await sb.from('country_marks').insert({user_id:me, code, kind}); }
+  loadMarks();
+}
+async function toggleFav(){
+  if(!sb){ alert(t('beNeed')); return; }
+  const on = document.getElementById('bFav').classList.contains('on');
+  if(on){ await sb.from('favorites').delete().match({user_id:me, code}); }
+  else  { await sb.from('favorites').insert({user_id:me, code}); }
+  loadMarks();
+}
+async function loadComments(){
+  const list = document.getElementById('cmtList'); if(!list) return;
+  const { data, error } = await sb.from('comments').select('*').eq('code', code).order('created_at', {ascending:false});
+  if(error){ list.innerHTML = `<div class="cmt-empty">${t('cmtFail')}${esc(error.message)}</div>`; return; }
+  if(!data.length){ list.innerHTML = `<div class="cmt-empty">${t('cmtEmpty')}</div>`; return; }
+  const loc = LANG==='en' ? 'en-US' : 'ko-KR';
+  list.innerHTML = data.map(cm => `<div class="cmt">
+      ${cm.user_id===me ? `<button class="del" onclick="delComment(${cm.id})">${t('cmtDel')}</button>` : ""}
+      <div class="who">${esc(cm.nickname)}<span class="when">${new Date(cm.created_at).toLocaleDateString(loc,{month:'short',day:'numeric'})}</span></div>
+      <div class="txt">${esc(cm.body)}</div>
+    </div>`).join("");
+}
+async function postComment(){
+  const nick = (document.getElementById('cmtNick').value||"").trim(), body = (document.getElementById('cmtBody').value||"").trim();
+  if(!nick || !body){ alert(t('cmtNeedBoth')); return; }
+  localStorage.setItem('nick', nick);
+  const { error } = await sb.from('comments').insert({ code, user_id:me, nickname:nick.slice(0,20), body:body.slice(0,300) });
+  if(error){ alert((LANG==='en'?"Failed: ":"등록 실패: ") + error.message); return; }
+  document.getElementById('cmtBody').value = "";
+  loadComments();
+}
+async function delComment(id){
+  if(!confirm(t('cmtDelConfirm'))) return;
+  const { error } = await sb.from('comments').delete().eq('id', id);
+  if(error){ alert((LANG==='en'?"Delete failed: ":"삭제 실패: ") + error.message); return; }
+  loadComments();
+}
+</script>
+</body>
+</html>
