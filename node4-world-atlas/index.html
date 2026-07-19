@@ -29,6 +29,7 @@
   .langsw button{font-family:var(--disp);font-weight:700;font-size:.72rem;letter-spacing:.06em;border:0;background:transparent;color:var(--muted);padding:6px 13px;cursor:pointer;transition:.15s}
   .langsw button.on{background:var(--sel);color:var(--paper)}
   .mast-title{font-weight:900;font-size:clamp(2.1rem,6.4vw,4rem);line-height:1.02;letter-spacing:-.025em;margin:30px 0 0}
+  html[lang="en"] .mast-title{text-transform:uppercase;letter-spacing:-.01em}
   .mast-sub{color:var(--muted);font-size:1rem;max-width:54ch;margin:18px 0 0;line-height:1.75}
   /* top viewed band */
   .topband{margin:26px 0 0;padding:16px 0 0;display:none}
@@ -112,7 +113,7 @@
   <footer id="footer">KDT Node · World Atlas — Frontend + Supabase (visits · views · comments · reactions · favorites, RLS)</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=40c"></script>
+<script src="data.js?v=41"></script>
 <script>
 // ===== 상태 =====
 const state = { search:"", region:"전체", favOnly:false, popSort:false };
@@ -183,8 +184,8 @@ function card(c){
     <span class="tag">${esc(regionLabel(c.region))}</span>
     <div class="meta">${t('kCapital')} <span>${esc(L.capital(c).split("·")[0].split("(")[0])}</span> · ${t('kPop')} <span>${fmtPop(c.population)}</span></div>
     <div class="react">
-      <button class="rx ${MY.has(code+'|visited')?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleMark('${code}','visited')" title="${t('visited')}">✈️ ${cnt(code,'visited')}</button>
-      <button class="rx ${MY.has(code+'|wish')?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleMark('${code}','wish')" title="${t('wish')}">🧡 ${cnt(code,'wish')}</button>
+      <button class="rx ${MY.has(code+'|visited')?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleMark('${code}','visited')" title="${t('visited')}">✈️ ${baseCount(code,'visited')+cnt(code,'visited')}</button>
+      <button class="rx ${MY.has(code+'|wish')?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleMark('${code}','wish')" title="${t('wish')}">🧡 ${baseCount(code,'wish')+cnt(code,'wish')}</button>
     </div>
   </a>`;
 }

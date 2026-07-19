@@ -33,6 +33,11 @@
   .hero-in .wrap{padding-bottom:30px}
   .hero .flag{height:38px;width:auto;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.4);display:block;margin-bottom:14px}
   .hero h1{color:#fff;font-weight:900;font-size:clamp(2.2rem,7vw,4.2rem);line-height:1;letter-spacing:-.03em;margin:0}
+  html[lang="en"] .hero h1{text-transform:uppercase;letter-spacing:-.01em}
+  .flagblk{display:grid;grid-template-columns:132px 1fr;gap:24px;align-items:center}
+  .flagblk .fimg{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:8px;border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+  .flagblk p{margin:0;color:var(--ink);line-height:1.75;font-size:1.02rem}
+  @media(max-width:640px){ .flagblk{grid-template-columns:1fr;gap:14px} .flagblk .fimg{max-width:180px} }
   .hero .sub{font-family:var(--disp);color:rgba(255,255,255,.82);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;margin-top:12px}
   .hero .credit{position:absolute;bottom:10px;right:22px;z-index:2;font-family:var(--disp);font-size:.64rem;letter-spacing:.03em;color:rgba(255,255,255,.55)}
   /* breadcrumb */
@@ -117,7 +122,7 @@
   <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=40c"></script>
+<script src="data.js?v=41"></script>
 <script>
 const code = new URLSearchParams(location.search).get('c');
 const c = code && countryByCode(code);
@@ -214,10 +219,18 @@ function render(){
       </section>
 
       <section class="blk">
+        <div class="lbl">${LANG==='en'?'The Flag':'국기 이야기'}</div>
+        <div class="flagblk">
+          <img class="fimg" src="flags/${code}.svg" alt="${esc(L.name(c))} 국기">
+          <p>${esc(flagMeaning(code))}</p>
+        </div>
+      </section>
+
+      <section class="blk">
         <div class="lbl">${t('ovMark')}</div>
         <div class="actions">
-          <button class="rbtn" id="bVisited" onclick="toggleMark('visited')">✈️ ${t('visited')} <b id="cVisited">0</b></button>
-          <button class="rbtn wish" id="bWish" onclick="toggleMark('wish')">🧡 ${t('wish')} <b id="cWish">0</b></button>
+          <button class="rbtn" id="bVisited" onclick="toggleMark('visited')">✈️ ${t('visited')} <b id="cVisited">${baseCount(code,'visited')}</b></button>
+          <button class="rbtn wish" id="bWish" onclick="toggleMark('wish')">🧡 ${t('wish')} <b id="cWish">${baseCount(code,'wish')}</b></button>
           <button class="rbtn fav" id="bFav" onclick="toggleFav()">${t('markFavOff')}</button>
         </div>
         <div class="authline" id="authline">${t('beChecking')}</div>
@@ -274,19 +287,24 @@ function updateViewsFact(){
 
 // ===== 히어로/명소 이미지 (위키백과: 현재 언어) =====
 async function loadHero(){
-  let w = await fetchWiki(L.landmark(c), LANG);
-  if(!w || !w.img) { const w2 = await fetchWiki(L.name(c), LANG); if(w2 && w2.img){ w = { ...w2, title: L.landmark(c), extract: (w && w.extract) || w2.extract }; } }
+  const heroTitle = LANG==='en' ? (c.heroTitleEn || L.landmark(c)) : (c.heroTitle || c.landmark);
+  let hi = await fetchWiki(heroTitle, LANG);
+  // 명소 해설은 landmark 기준 (heroTitle override 시 별도 조회)
+  let extract = (hi && hi.extract) || "";
+  if(c.heroTitle || c.heroTitleEn){ const lm = await fetchWiki(L.landmark(c), LANG); if(lm){ if(lm.extract) extract = lm.extract; if(!hi || !hi.img) hi = lm; } }
+  const isFlag = u => !u || /Flag_of|\.svg(\?|$)/i.test(u);   // 국기/벡터는 히어로에서 제외
+  if(!hi || !hi.img || isFlag(hi.img)){ const w2 = await fetchWiki(L.name(c), LANG); if(w2 && w2.img && !isFlag(w2.img)) hi = { ...(hi||{}), img: w2.img, extract: extract || w2.extract }; }
   const hero = document.getElementById('hero'); if(!hero) return;
-  const pos = c.heroPos || 'center 30%';   // 상징 피사체가 프레임에 잘 들어오게(디렉터 피드백)
-  if(w && w.img){
+  const pos = c.heroPos || 'center 35%';
+  if(hi && hi.img){
     const im = new Image();
-    im.onload = () => { hero.style.backgroundImage = `url("${w.img}")`; hero.style.backgroundPosition = pos; hero.classList.remove('loading'); };
-    im.src = w.img;
+    im.onload = () => { hero.style.backgroundImage = `url("${hi.img}")`; hero.style.backgroundPosition = pos; hero.classList.remove('loading'); };
+    im.src = hi.img;
     const hc = document.getElementById('heroCredit'); if(hc) hc.textContent = t('photoCredit');
-    const pimg = document.getElementById('placeImg'); if(pimg){ pimg.style.backgroundImage = `url("${w.img}")`; pimg.style.backgroundPosition = pos; }
+    const pimg = document.getElementById('placeImg'); if(pimg){ pimg.style.backgroundImage = `url("${hi.img}")`; pimg.style.backgroundPosition = pos; }
   }
   const pt = document.getElementById('placeText');
-  if(pt){ pt.textContent = (w && w.extract) ? w.extract : (LANG==='en' ? `${L.landmark(c)}, the landmark of ${L.name(c)}.` : `${c.name}의 대표 명소인 ${c.landmark}입니다.`); pt.style.color = ""; }
+  if(pt){ pt.textContent = extract || (LANG==='en' ? `${L.landmark(c)}, the landmark of ${L.name(c)}.` : `${c.name}의 대표 명소인 ${c.landmark}입니다.`); pt.style.color = ""; }
 }
 
 // ===== 백엔드 (Supabase) =====
@@ -312,7 +330,7 @@ async function loadMarks(){
   ]);
   const cnt = {visited:0, wish:0}; (all.data||[]).forEach(r => cnt[r.kind]!==undefined && cnt[r.kind]++);
   const bv=document.getElementById('cVisited'), bw=document.getElementById('cWish');
-  if(bv) bv.textContent = cnt.visited; if(bw) bw.textContent = cnt.wish;
+  if(bv) bv.textContent = baseCount(code,'visited') + cnt.visited; if(bw) bw.textContent = baseCount(code,'wish') + cnt.wish;
   const myset = new Set((mine.data||[]).map(r=>r.kind));
   const eV=document.getElementById('bVisited'), eW=document.getElementById('bWish');
   if(eV) eV.classList.toggle('on', myset.has('visited'));

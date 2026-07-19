@@ -13,7 +13,7 @@ const COUNTRIES = [
   { id:5, name:"태국", nameEn:"Thailand", flag:"🇹🇭", capital:"방콕", capitalEn:"Bangkok", region:"아시아", population:71700000, area:513120, languages:"태국어", languagesEn:"Thai", religion:"불교(상좌부)", religionEn:"Buddhist (Theravada)", currency:"바트 (THB)", currencyEn:"Baht (THB)", dial:"+66", desc:"'미소의 나라'. 동남아에서 식민 지배를 받지 않은 유일한 나라.", descEn:"The 'Land of Smiles' — the only Southeast Asian nation never colonized.", landmark:"왓 아룬", landmarkEn:"Wat Arun", fun:"수도 방콕의 정식 이름은 세계에서 가장 긴 지명이에요. '태국(Thai)'은 '자유'라는 뜻.", funEn:"Bangkok's full ceremonial name is the longest place name in the world. 'Thai' means 'free.'" },
   { id:6, name:"베트남", nameEn:"Vietnam", flag:"🇻🇳", capital:"하노이", capitalEn:"Hanoi", region:"아시아", population:98900000, area:331212, languages:"베트남어", languagesEn:"Vietnamese", religion:"무종교·불교", religionEn:"None·Buddhist", currency:"동 (VND)", currencyEn:"Dong (VND)", dial:"+84", desc:"쌀국수(퍼)와 커피로 유명. 남북으로 길게 뻗은 지형.", descEn:"Famous for pho and coffee, with a long north-south geography.", landmark:"하롱베이", landmarkEn:"Ha Long Bay", fun:"세계 2위 커피 수출국이에요. 연유를 넣은 진한 베트남 커피가 유명.", funEn:"The world's 2nd-largest coffee exporter, known for strong Vietnamese coffee served with condensed milk." },
   { id:7, name:"인도네시아", nameEn:"Indonesia", flag:"🇮🇩", capital:"자카르타", capitalEn:"Jakarta", region:"아시아", population:277000000, area:1904569, languages:"인도네시아어", languagesEn:"Indonesian", religion:"이슬람교", religionEn:"Muslim", currency:"루피아 (IDR)", currencyEn:"Rupiah (IDR)", dial:"+62", desc:"1만 7천여 개 섬으로 이루어진 세계 최대의 도서(섬) 국가.", descEn:"The world's largest archipelagic nation, made up of over 17,000 islands.", landmark:"보로부두르", landmarkEn:"Borobudur", fun:"1만 7천여 개 섬 중 사람이 사는 곳은 약 6천 개. 지역 언어가 700개가 넘어요.", funEn:"Of its 17,000+ islands, about 6,000 are inhabited, and it has more than 700 local languages." },
-  { id:8, name:"사우디아라비아", nameEn:"Saudi Arabia", flag:"🇸🇦", capital:"리야드", capitalEn:"Riyadh", region:"아시아", population:36900000, area:2149690, languages:"아랍어", languagesEn:"Arabic", religion:"이슬람교", religionEn:"Muslim", currency:"리얄 (SAR)", currencyEn:"Riyal (SAR)", dial:"+966", desc:"이슬람 성지 메카·메디나가 있는 나라. 세계적인 산유국.", descEn:"Home to the Islamic holy cities of Mecca and Medina, and a leading oil producer.", landmark:"메카", landmarkEn:"Mecca", fun:"국토 대부분이 사막이라 1년 내내 흐르는 강이 하나도 없는 나라예요.", funEn:"Mostly desert, it's one of the only countries with no permanent rivers at all." },
+  { id:8, name:"사우디아라비아", nameEn:"Saudi Arabia", flag:"🇸🇦", capital:"리야드", capitalEn:"Riyadh", region:"아시아", population:36900000, area:2149690, languages:"아랍어", languagesEn:"Arabic", religion:"이슬람교", religionEn:"Muslim", currency:"리얄 (SAR)", currencyEn:"Riyal (SAR)", dial:"+966", desc:"이슬람 성지 메카·메디나가 있는 나라. 세계적인 산유국.", descEn:"Home to the Islamic holy cities of Mecca and Medina, and a leading oil producer.", landmark:"메카", landmarkEn:"Mecca", heroTitle:"카바", heroTitleEn:"Kaaba", fun:"국토 대부분이 사막이라 1년 내내 흐르는 강이 하나도 없는 나라예요.", funEn:"Mostly desert, it's one of the only countries with no permanent rivers at all." },
   { id:9, name:"프랑스", nameEn:"France", flag:"🇫🇷", capital:"파리", capitalEn:"Paris", region:"유럽", population:68000000, area:551695, languages:"프랑스어", languagesEn:"French", religion:"가톨릭·무종교", religionEn:"Catholic·None", currency:"유로 (EUR)", currencyEn:"Euro (EUR)", dial:"+33", desc:"세계에서 관광객이 가장 많이 찾는 나라. 예술과 요리의 중심.", descEn:"The world's most-visited country — a center of art and cuisine.", landmark:"에펠탑", landmarkEn:"Eiffel Tower", fun:"에펠탑은 1889년 만국박람회용 임시 구조물로, 원래 20년 뒤 철거될 예정이었어요. 관광객 세계 1위 국가.", funEn:"The Eiffel Tower was a temporary structure for the 1889 World's Fair, meant to be dismantled 20 years later. France is the #1 tourist destination." },
   { id:10, name:"독일", nameEn:"Germany", flag:"🇩🇪", capital:"베를린", capitalEn:"Berlin", region:"유럽", population:84000000, area:357588, languages:"독일어", languagesEn:"German", religion:"개신교·가톨릭", religionEn:"Protestant·Catholic", currency:"유로 (EUR)", currencyEn:"Euro (EUR)", dial:"+49", desc:"유럽 최대 경제국. 자동차·기계 산업과 맥주 축제로 유명.", descEn:"Europe's largest economy, famous for its auto and machinery industries and its beer festival.", landmark:"브란덴부르크 문", landmarkEn:"Brandenburg Gate", fun:"고속도로 아우토반의 일부 구간은 공식 속도 제한이 없어요. 빵 종류가 3천 가지가 넘습니다.", funEn:"Parts of the Autobahn have no official speed limit, and Germany has over 3,000 kinds of bread." },
   { id:11, name:"영국", nameEn:"United Kingdom", flag:"🇬🇧", capital:"런던", capitalEn:"London", region:"유럽", population:67000000, area:242495, languages:"영어", languagesEn:"English", religion:"개신교(성공회)·무종교", religionEn:"Protestant (Anglican)·None", currency:"파운드 (GBP)", currencyEn:"Pound (GBP)", dial:"+44", desc:"산업혁명의 발상지. 잉글랜드·스코틀랜드·웨일스·북아일랜드의 연합.", descEn:"Birthplace of the Industrial Revolution — a union of England, Scotland, Wales, and Northern Ireland.", landmark:"빅 벤", landmarkEn:"Big Ben", fun:"'빅 벤'은 사실 시계탑이 아니라 그 안에 달린 큰 종의 이름이에요. 지금도 도로 좌측통행.", funEn:"'Big Ben' is actually the name of the great bell inside the tower, not the tower itself. Traffic still drives on the left." },
@@ -50,6 +50,56 @@ const COUNTRIES = [
 const REGIONS = ["전체","아시아","유럽","북아메리카","남아메리카","아프리카","오세아니아"];
 const REGION_EN = { "전체":"All", "아시아":"Asia", "유럽":"Europe", "북아메리카":"North America", "남아메리카":"South America", "아프리카":"Africa", "오세아니아":"Oceania" };
 
+// ===== 국기 의미 (상세페이지 '국기 이야기') — ISO 코드 기준 =====
+const FLAG_MEANING = {
+  kr:{ko:"태극(음양의 조화)과 네 모서리의 4괘(건·곤·감·리), 흰 바탕은 평화와 순수를 뜻해요.",en:"The taegeuk (yin-yang harmony) with four trigrams at the corners; the white field stands for peace and purity."},
+  jp:{ko:"흰 바탕 가운데의 붉은 원은 떠오르는 태양을 나타내요.",en:"A red disc on white representing the rising sun."},
+  cn:{ko:"큰 별은 공산당, 작은 별 4개는 인민의 단결을 뜻해요.",en:"The large star represents the Party; the four small stars, the unity of the people."},
+  in:{ko:"사프란(용기)·흰색(평화)·초록(번영)에 가운데 아소카 차크라(법륜).",en:"Saffron for courage, white for peace, green for prosperity, with the Ashoka Chakra (wheel of law) in the center."},
+  th:{ko:"빨강은 국민, 흰색은 종교, 파랑은 왕실을 상징해요.",en:"Red for the nation, white for religion, blue for the monarchy."},
+  vn:{ko:"붉은 바탕은 혁명, 노란 별은 인민의 단결을 뜻해요.",en:"The red field for revolution, the gold star for the people's unity."},
+  id:{ko:"빨강(용기)과 흰색(순결)의 두 가로줄.",en:"Two bands: red for courage and white for purity."},
+  sa:{ko:"초록 바탕에 이슬람 신앙고백(샤하다)과 검이 그려져 있어요.",en:"The Islamic declaration of faith (shahada) and a sword on a green field."},
+  fr:{ko:"파랑·흰색·빨강 삼색기 — 자유·평등·박애를 상징해요.",en:"The blue-white-red tricolour — liberty, equality, fraternity."},
+  de:{ko:"검정·빨강·금색 — 통일과 자유의 상징이에요.",en:"Black, red, and gold — symbols of unity and freedom."},
+  gb:{ko:"잉글랜드·스코틀랜드·아일랜드의 십자를 합친 유니언잭.",en:"The Union Jack, combining the crosses of England, Scotland, and Ireland."},
+  it:{ko:"초록·흰색·빨강의 삼색기.",en:"The green-white-red tricolour."},
+  es:{ko:"빨강·노랑 바탕에 국가 문장(紋章)이 들어가요.",en:"Red and yellow bands bearing the national coat of arms."},
+  no:{ko:"빨강 바탕에 파란 십자를 흰색으로 두른 스칸디나비아 십자.",en:"A Scandinavian cross: blue outlined in white on a red field."},
+  va:{ko:"노랑·흰색 바탕에 교황의 열쇠와 삼중관.",en:"The papal keys and tiara on yellow and white."},
+  us:{ko:"별 50개는 현재의 주, 13개 줄은 건국 당시 식민지를 뜻해요.",en:"50 stars for the states today, 13 stripes for the founding colonies."},
+  ca:{ko:"붉은 단풍잎 — 캐나다를 상징하는 잎이에요.",en:"The red maple leaf — Canada's emblem."},
+  mx:{ko:"초록·흰색·빨강에 독수리와 뱀(아즈텍 건국신화).",en:"Green, white, and red with the eagle and serpent from Aztec legend."},
+  br:{ko:"초록(숲)·노랑(금)에 파란 천구와 '질서와 진보' 문구.",en:"Green for forests, yellow for gold, with a blue celestial globe reading 'Order and Progress.'"},
+  ar:{ko:"하늘색·흰색 줄무늬와 가운데 '5월의 태양'.",en:"Sky-blue and white stripes with the 'Sun of May' in the center."},
+  pe:{ko:"빨강·흰색·빨강 — 잉카와 독립을 상징하는 색이에요.",en:"Red-white-red — colors of the Inca and of independence."},
+  eg:{ko:"빨강·흰색·검정 삼색에 살라딘의 독수리.",en:"Red, white, and black with the Eagle of Saladin."},
+  za:{ko:"여러 색을 Y자로 합쳐 '무지개 국가'의 통합을 표현해요.",en:"A Y-shape merging many colors — unity of the 'Rainbow Nation.'"},
+  ke:{ko:"검정(국민)·빨강(투쟁)·초록(자연)에 마사이 방패와 창.",en:"Black for the people, red for struggle, green for nature, with a Maasai shield and spears."},
+  au:{ko:"유니언잭·연방별(7각별)·남십자성.",en:"The Union Jack, the seven-pointed Commonwealth Star, and the Southern Cross."},
+  nz:{ko:"유니언잭과 붉은 남십자성 별 4개.",en:"The Union Jack with the four red stars of the Southern Cross."},
+  ph:{ko:"파랑(평화)·빨강(용기)과 흰 삼각형 안의 태양·별 3개.",en:"Blue for peace, red for courage, and a white triangle with a sun and three stars."},
+  sg:{ko:"빨강·흰색에 초승달과 별 5개(민주·평화·진보·정의·평등).",en:"Red and white with a crescent and five stars (democracy, peace, progress, justice, equality)."},
+  tr:{ko:"붉은 바탕에 초승달과 별.",en:"A crescent and star on a red field."},
+  ae:{ko:"빨강·초록·흰색·검정 — 범아랍 색이에요.",en:"Red, green, white, and black — the Pan-Arab colors."},
+  nl:{ko:"빨강·흰색·파랑 삼색기(세계 최초의 삼색기 중 하나).",en:"A red-white-blue tricolour — one of the world's first."},
+  ch:{ko:"붉은 바탕의 흰 십자, 정사각형 국기예요.",en:"A white cross on red — and a rare square flag."},
+  se:{ko:"파란 바탕의 노란 스칸디나비아 십자.",en:"A yellow Scandinavian cross on a blue field."},
+  gr:{ko:"파랑·흰색 9줄과 십자 — 바다와 정교회 신앙.",en:"Nine blue-and-white stripes and a cross — the sea and Orthodox faith."},
+  pt:{ko:"초록·빨강에 혼천의(항해 도구)와 방패.",en:"Green and red with an armillary sphere (a navigation tool) and a shield."},
+  ru:{ko:"흰색·파랑·빨강의 삼색기.",en:"A white-blue-red tricolour."},
+  cl:{ko:"흰색·빨강에 파란 사각형과 흰 별.",en:"White and red with a blue canton and a white star."},
+  co:{ko:"노랑(부)·파랑(바다)·빨강(피와 독립).",en:"Yellow for wealth, blue for the seas, red for blood and independence."},
+  ng:{ko:"초록·흰색·초록 — 농업과 평화를 상징해요.",en:"Green-white-green — agriculture and peace."},
+  ma:{ko:"붉은 바탕에 초록 오각별 '술라이만의 별'.",en:"A green pentagram, the 'Seal of Solomon,' on a red field."}
+};
+const flagMeaning = code => { const f = FLAG_MEANING[code]; return f ? (LANG==='en' ? f.en : f.ko) : ''; };
+
+// ===== 관광 기반 표시용 베이스라인 (프랑스=100 상대치) =====
+// 카드/상세의 가봤어요·가고싶어요에 더해 생동감을 줌. 실제 클릭은 여기에 더해져 저장됨.
+const TOUR = { fr:100, es:92, us:80, it:68, cn:66, tr:62, mx:46, de:40, th:40, gb:40, gr:36, jp:34, pt:30, sa:30, ru:28, ca:26, va:26, ae:26, nl:22, sg:22, kr:20, in:20, ch:20, vn:20, id:18, eg:15, ma:15, za:12, se:12, no:12, au:12, ph:12, br:10, cl:8, ar:8, nz:8, pe:6, co:6, ke:4, ng:2 };
+const baseCount = (code, kind) => { const t = TOUR[code] || 0; return kind==='visited' ? t : Math.round(t*0.7); };
+
 // ===== 언어(i18n) =====
 let LANG = (localStorage.getItem('lang') === 'en') ? 'en' : 'ko';
 function setLang(l){ LANG = (l === 'en') ? 'en' : 'ko'; localStorage.setItem('lang', LANG); }
@@ -71,7 +121,7 @@ const regionLabel = r => LANG==='en' ? (REGION_EN[r]||r) : r;
 const I18N = {
   ko: {
     docTitle:"세계 국가 도감", brand:"World Atlas · 세계 국가 도감",
-    mastTitle:"세계의 나라들,<br>한 장에 담다.",
+    mastTitle:"세계를,<br>한 장에 펼치다.",
     mastSub:"40개국의 국기·수도·인구·면적·언어·종교·통화를 한눈에. 나라를 눌러 상세 페이지로 들어가고, 가봤어요·가고싶어요·댓글로 여행의 기억을 나눠요.",
     searchPh:"나라 이름으로 검색 (예: 프랑스, 브라질)", searchAria:"국가 검색",
     fav:"⭐ 즐겨찾기", popular:"🔥 인기순",
@@ -101,7 +151,7 @@ const I18N = {
   },
   en: {
     docTitle:"World Atlas", brand:"World Atlas",
-    mastTitle:"The world's nations,<br>on a single page.",
+    mastTitle:"The World,<br>Unfolded.",
     mastSub:"Flags, capitals, population, area, languages, religion, and currency for 40 countries at a glance. Tap a country for its page, and share your travel memories with been-there, want-to-go, and comments.",
     searchPh:"Search by country name (e.g. France, Brazil)", searchAria:"Search countries",
     fav:"⭐ Favorites", popular:"🔥 Popular",
@@ -156,8 +206,9 @@ async function fetchWiki(title, lang){
     const r = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/` + encodeURIComponent(title), { headers:{ accept:"application/json" } });
     if(!r.ok) return null;
     const d = await r.json();
-    const img = (d.originalimage && d.originalimage.source) || (d.thumbnail && d.thumbnail.source) || null;
-    return { title: d.title || title, img, extract: d.extract || "", url: (d.content_urls && d.content_urls.desktop && d.content_urls.desktop.page) || "" };
+    const oi = d.originalimage || d.thumbnail || {};
+    const img = oi.source || null;
+    return { title: d.title || title, img, w: oi.width||0, h: oi.height||0, extract: d.extract || "", url: (d.content_urls && d.content_urls.desktop && d.content_urls.desktop.page) || "" };
   }catch(e){ return null; }
 }
 
