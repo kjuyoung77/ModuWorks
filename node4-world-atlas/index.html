@@ -282,28 +282,34 @@ applyStatic();
 render();
 initAuth();
 
-// ===== 마스트헤드 회전 도트 지구본 =====
+// ===== 마스트헤드 회전 도트 지구본 (대륙 표시) =====
 (function(){
   const cv = document.getElementById('globe'); if(!cv) return;
   const ctx = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let DPR=1, W=0, H=0, R=0, cx=0, cy=0;
-  const N=1300, pts=[];
-  for(let i=0;i<N;i++){ const y=1-(i/(N-1))*2; const r=Math.sqrt(Math.max(0,1-y*y)); const th=i*2.399963; pts.push([Math.cos(th)*r, y, Math.sin(th)*r, i%41===0]); }
+  // 저해상 육지 마스크(72×36, 세계지도에서 추출한 hex → 비트). 1=육지
+  const MW=72, MH=36;
+  const HEX="0000000000000000000000000000000000000000bbff03002080000018d07f00027ffdc09fffd27c01f7ffffff1fffc62003fffffffe087f8d0017ffffff18003fff803fffffff90001fdec01fffffff00001fdc003bcffffc80001ff8003dfffff500000ff0003c1ffff000000380007ffffff000000198007fef3fe0000001c0007ffe19c00000003400fffc11c000000017807ffc010800000007c003f801200000000ff003f000a10000000ff803f0001980000007f803f0000280000003f003f4000f80000003f001e4001fc0000003c001c0001fc0000003c000c00019c00000070000000000c2000002000000000000000006000000000000000004000000000000000000000000000000000000000000000000000000000300000307ffc00000cb00fffffffffcffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+  const land=new Uint8Array(MW*MH);
+  for(let i=0;i<HEX.length;i++){ const n=parseInt(HEX[i],16); land[i*4]=(n>>3)&1; land[i*4+1]=(n>>2)&1; land[i*4+2]=(n>>1)&1; land[i*4+3]=n&1; }
+  const isLand=(x,y,z)=>{ const lon=Math.atan2(z,x), lat=Math.asin(Math.max(-1,Math.min(1,y))); let mx=Math.floor((lon+Math.PI)/(2*Math.PI)*MW), my=Math.floor((Math.PI/2-lat)/Math.PI*MH); mx=(mx%MW+MW)%MW; my=Math.max(0,Math.min(MH-1,my)); return land[my*MW+mx]; };
+  const M=6000, dots=[];
+  for(let i=0;i<M;i++){ const y=1-(i/(M-1))*2; const r=Math.sqrt(Math.max(0,1-y*y)); const th=i*2.399963; const x=Math.cos(th)*r, z=Math.sin(th)*r; const L=isLand(x,y,z); dots.push([x,y,z,L,(L&&i%53===0)]); }
   const tilt=-0.34, ct=Math.cos(tilt), st=Math.sin(tilt);
   const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   let ink=cssVar('--ink')||'#1c1b18', star=cssVar('--star')||'#b5773a';
   window.__globeTheme = () => { ink=cssVar('--ink')||ink; star=cssVar('--star')||star; };
-  function resize(){ const s=cv.clientWidth||0; DPR=Math.min(window.devicePixelRatio||1,2); cv.width=s*DPR; cv.height=s*DPR; W=cv.width; H=cv.height; R=W*0.42; cx=W/2; cy=H/2; }
+  let DPR=1, CW=0, CH=0, R=0, cx=0, cy=0;
+  function resize(){ const s=cv.clientWidth||0; DPR=Math.min(window.devicePixelRatio||1,2); cv.width=s*DPR; cv.height=s*DPR; CW=cv.width; CH=cv.height; R=CW*0.44; cx=CW/2; cy=CH/2; }
   resize(); addEventListener('resize', resize);
   let a=0;
   function frame(){
-    if(W){ ctx.clearRect(0,0,W,H); const ca=Math.cos(a), sa=Math.sin(a);
-      for(const p of pts){
+    if(CW){ ctx.clearRect(0,0,CW,CH); const ca=Math.cos(a), sa=Math.sin(a);
+      for(const p of dots){
         const x=p[0]*ca - p[2]*sa, z=p[0]*sa + p[2]*ca, y=p[1];
         const y2=y*ct - z*st, z2=y*st + z*ct, depth=(z2+1)/2;
-        ctx.globalAlpha=0.10+depth*0.72; ctx.fillStyle=p[3]?star:ink;
-        ctx.beginPath(); ctx.arc(cx+x*R, cy+y2*R, (0.5+depth*1.25)*DPR, 0, 6.2832); ctx.fill();
+        if(p[3]){ ctx.globalAlpha=0.16+depth*0.72; ctx.fillStyle=p[4]?star:ink; ctx.beginPath(); ctx.arc(cx+x*R, cy+y2*R, (0.6+depth*1.2)*DPR, 0, 6.2832); ctx.fill(); }
+        else { ctx.globalAlpha=0.05+depth*0.11; ctx.fillStyle=ink; ctx.beginPath(); ctx.arc(cx+x*R, cy+y2*R, (0.4+depth*0.6)*DPR, 0, 6.2832); ctx.fill(); }
       }
       ctx.globalAlpha=1;
     }
