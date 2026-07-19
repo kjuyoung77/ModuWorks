@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git &amp; GitHub 핵심 정리 · 퀘스트B 티칭 · 김주영</title>
+<style>
+  body{margin:0;color:#222;background:#fff;font-family:"Noto Sans KR","Apple SD Gothic Neo",Arial,sans-serif;line-height:1.7;word-break:keep-all}
+  .wrap{max-width:820px;margin:auto;padding:46px 36px 72px}
+  h1{font-size:1.6rem;margin:0 0 4px;letter-spacing:-.01em}
+  .meta{color:#777;font-size:.9rem;margin-bottom:8px}
+  .frame{background:#f6f7f9;border:1px solid #e2e4e8;border-left:3px solid #2563eb;border-radius:8px;padding:12px 16px;margin:18px 0 26px;font-size:.95rem;color:#334}
+  .frame b{color:#1a1a1a}
+  h2{font-size:1.16rem;margin:34px 0 10px;padding-bottom:6px;border-bottom:1px solid #ddd}
+  h3{font-size:1.02rem;margin:22px 0 6px}
+  p{margin:.5em 0}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.93rem}
+  th,td{border:1px solid #e0e2e6;padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:#f6f6f6;white-space:nowrap}
+  code{background:#eef1f5;border-radius:4px;padding:1px 6px;font-family:"D2Coding",Consolas,monospace;font-size:.88em}
+  ul,ol{margin:.4em 0;padding-left:1.3rem}li{margin:4px 0}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0;font-size:.9rem}
+  .flow span{background:#eff4ff;border:1px solid #cfe0ff;border-radius:999px;padding:5px 13px;font-weight:600;color:#1e40af}
+  .flow i{color:#9aa;font-style:normal}
+  .qa{border:1px solid #e6e8ec;border-radius:10px;padding:14px 18px;margin:12px 0;background:#fcfcfd}
+  .qa .q{font-weight:800;color:#111}
+  .qa .star{color:#e0a11a}
+  .qa .a{margin:6px 0 2px}.qa .a b{color:#1a5}.qa .exp{color:#555;font-size:.92rem}
+  .src{color:#777;font-size:.86rem;margin-top:30px;border-top:1px solid #eee;padding-top:14px}
+  .back{display:inline-block;margin-bottom:22px;font-size:.85rem;color:#2563eb;text-decoration:none}
+  .back:hover{text-decoration:underline}
+  @media print{.wrap{padding:0}.back{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← ModuWorks 갤러리</a>
+  <h1>Git &amp; GitHub 핵심 정리 + 예상문제</h1>
+  <div class="meta">퀘스트B · 팀 간 티칭(타팀을 이해시켜라) · 김주영</div>
+  <div class="frame">
+    <b>한 줄 프레임:</b> AI는 생성하고, Git은 고정한다. AI는 속도를, Git은 되돌아갈 길을 준다.<br>
+    <span style="color:#777;font-size:.9rem">출처 ① 허남철 「초보자를 위한 git과 Github 시작하기」(실습) · ② 조해창(퍼실) 「Git이 뭔데, 설치하라는 건가요?」(개념·AI시대)</span>
+  </div>
+
+  <h2>📌 30초 요약</h2>
+  <ul>
+    <li><b>Git</b> = 프로젝트가 <b>언제·누가·무엇을·왜</b> 바꿨는지 기록하고 <b>되돌릴 수 있게</b> 하는 버전관리 도구. 로컬에서 인터넷 없이도 동작.</li>
+    <li><b>GitHub</b> = Git 저장소를 <b>온라인에 보관 + 협업</b>(Issue·PR·리뷰·자동화)하게 해주는 서비스. 여러 선택지 중 하나(GitLab·Bitbucket도 있음).</li>
+    <li><b>AI 시대에 Git이 더 중요해진 이유</b> = AI가 코드를 빠르게 대량으로 바꾸는 만큼, 무엇이 바뀌었고 문제 시 되돌릴 수 있는 <b>안전장치</b>가 필수이기 때문.</li>
+  </ul>
+
+  <h2>1. 핵심 개념</h2>
+  <h3>Git vs GitHub</h3>
+  <table>
+    <tr><th>구분</th><th>Git</th><th>GitHub</th></tr>
+    <tr><td>정체</td><td>버전관리 <b>도구</b></td><td>Git 저장소 <b>호스팅·협업 서비스</b></td></tr>
+    <tr><td>위치</td><td>내 컴퓨터(로컬), 오프라인 OK</td><td>온라인(원격)</td></tr>
+    <tr><td>계정</td><td>없어도 됨</td><td>필요</td></tr>
+    <tr><td>대체재</td><td>—</td><td>GitLab·Bitbucket·자체서버</td></tr>
+    <tr><td>핵심 기능</td><td>커밋·브랜치·이력 비교·동기화</td><td>Issue·PR·Code Review·Actions</td></tr>
+  </table>
+
+  <h3>파일이 저장되는 3개의 공간</h3>
+  <table>
+    <tr><th>공간</th><th>설명</th></tr>
+    <tr><td>Working Directory</td><td>파일을 실제로 수정하는 작업 공간</td></tr>
+    <tr><td>Staging Area (Index)</td><td><code>git add</code>로 커밋할 파일을 준비하는 공간</td></tr>
+    <tr><td>HEAD</td><td>브랜치의 최신 커밋을 가리키는 포인터</td></tr>
+  </table>
+  <div class="flow"><span>작업 Working</span><i>→ add →</i><span>준비 Staging</span><i>→ commit →</i><span>확정 스냅샷</span></div>
+
+  <h3>주요 명령어</h3>
+  <table>
+    <tr><th>명령어</th><th>의미</th></tr>
+    <tr><td><code>git init</code></td><td>폴더를 git으로 관리 시작 (<code>.git</code> 생성)</td></tr>
+    <tr><td><code>git status</code></td><td>현재 변경 상태 확인</td></tr>
+    <tr><td><code>git add &lt;file&gt;</code></td><td>변경 파일을 스테이징에 올림</td></tr>
+    <tr><td><code>git commit -m "메시지"</code></td><td>특정 시점 스냅샷 확정</td></tr>
+    <tr><td><code>git log</code></td><td>커밋 이력(해시·작성자·메시지) 확인</td></tr>
+    <tr><td><code>git remote add origin &lt;url&gt;</code></td><td>원격 저장소 연결 (origin=별칭)</td></tr>
+    <tr><td><code>git push origin main</code></td><td>로컬 커밋 → 원격으로 전송</td></tr>
+    <tr><td><code>git pull origin main</code></td><td>원격 변경 → 로컬로 가져와 병합</td></tr>
+    <tr><td><code>git clone &lt;url&gt;</code></td><td>원격 저장소를 통째로 복제</td></tr>
+    <tr><td><code>git diff</code></td><td>이전 상태와 현재의 차이 확인</td></tr>
+  </table>
+
+  <h3>Branch(브랜치) &amp; Merge(병합)</h3>
+  <ul>
+    <li><b>브랜치 = 특정 커밋을 가리키는 가벼운 이름표(포인터).</b> 프로젝트 통째 복사가 <b>아님</b>.</li>
+    <li>활용: 새 기능 / 버그 수정 / 실험 — 메인에 영향 없이 작업 후 마음에 들면 <b>merge</b>, 아니면 삭제.</li>
+    <li><b>merge</b> = 갈래 합치기. 같은 부분을 다르게 고쳤으면 <b>충돌(conflict)</b>.</li>
+    <li><b>충돌은 Git 고장이 아니라 "여기는 사람이 판단하라"는 정직한 신호.</b></li>
+  </ul>
+
+  <h3>AI 시대에 Git이 필요한 5가지</h3>
+  <ol>
+    <li><b>상태 파악</b> — <code>status</code>/<code>diff</code>/<code>log</code>로 무엇이 바뀌었는지 안정적으로 읽음</li>
+    <li><b>안전장치</b> — 커밋 = 게임 세이브포인트. 큰 작업 전 커밋 = 실패 비용↓</li>
+    <li><b>협업의 언어</b> — PR·리뷰·revert가 Git 기록 위에서 작동</li>
+    <li><b>로컬 우선</b> — 네트워크 없이도 로그·브랜치·커밋·비교 가능</li>
+    <li><b>책임 경계</b> — 어느 파일·어느 줄을 왜 바꿨는지 기록(좋은 커밋 메시지)</li>
+  </ol>
+  <p style="color:#555;font-size:.93rem"><b>지속가능한 바이브코딩 루프:</b> 작업 전 커밋 → AI에 작은 변경 요청 → <code>git diff</code> 확인 → 테스트 → OK면 커밋 / 아니면 되돌리기 → 다른 브랜치로 다른 접근.</p>
+
+  <h2>2. 출제 유력 문제 (⭐ = 유력)</h2>
+
+  <div class="qa"><div class="q"><span class="star">⭐</span> Q1. Git과 GitHub의 차이는?</div>
+    <div class="a"><b>답:</b> Git=내 컴퓨터에서도 돌아가는 버전관리 도구 / GitHub=Git 저장소를 온라인에 보관·협업하게 해주는 서비스 중 하나.</div>
+    <div class="exp">Git은 GitHub 없이도, 인터넷·계정 없이도 쓸 수 있음. "GitHub=Git"이 아님이 핵심.</div></div>
+
+  <div class="qa"><div class="q"><span class="star">⭐</span> Q2. 버전관리란 무엇이고 왜 필요한가?</div>
+    <div class="a"><b>답:</b> 프로젝트가 시간에 따라 어떻게 바뀌었는지 기록하고 비교·되돌리는 것.</div>
+    <div class="exp"><code>보고서_진짜최종.docx</code>가 원시적 버전관리. 코드는 파일이 수십~수백 개라 추적이 필수.</div></div>
+
+  <div class="qa"><div class="q"><span class="star">⭐</span> Q3. add와 commit의 차이 / Staging Area란?</div>
+    <div class="a"><b>답:</b> add=변경 파일을 스테이징에 올리는 준비 단계 / commit=그 순간을 스냅샷으로 확정.</div>
+    <div class="exp">바로 커밋되는 게 아니라 <b>준비→확정</b> 2단계인 것이 포인트. HEAD는 최신 커밋 포인터.</div></div>
+
+  <div class="qa"><div class="q"><span class="star">⭐</span> Q4. branch란? 프로젝트를 통째로 복사하는 것인가?</div>
+    <div class="a"><b>답:</b> 아니다. 브랜치는 특정 커밋을 가리키는 <b>가벼운 이름표(포인터)</b>.</div>
+    <div class="exp">main·feature/login 같은 이름표가 각각 다른 커밋을 가리킴.</div></div>
+
+  <div class="qa"><div class="q"><span class="star">⭐</span> Q5. merge와 충돌? 충돌은 Git이 고장난 것인가?</div>
+    <div class="a"><b>답:</b> merge=서로 다른 갈래를 합치기 / 충돌=같은 부분을 다르게 고쳤을 때 발생. 고장이 아님.</div>
+    <div class="exp">충돌은 "사람이 판단하라"는 Git의 정직한 신호.</div></div>
+
+  <div class="qa"><div class="q"><span class="star">⭐</span> Q6. AI 시대에 Git이 왜 더 중요한가?</div>
+    <div class="a"><b>답:</b> ①상태 파악 ②안전장치 ③협업의 언어 ④로컬 우선 ⑤인간-AI 책임 경계.</div>
+    <div class="exp">AI가 코드를 빠르고 대량으로 바꾸므로 되돌릴 장치가 더 필요. "AI는 생성, Git은 고정."</div></div>
+
+  <div class="qa"><div class="q">Q7. push와 pull의 차이? origin은?</div>
+    <div class="a"><b>답:</b> push=로컬→원격 전송 / pull=원격→로컬 병합. origin=원격 저장소의 별칭.</div></div>
+
+  <div class="qa"><div class="q">Q8. git init을 하면?</div>
+    <div class="a"><b>답:</b> 그 폴더를 git으로 관리 시작하고 <code>.git</code> 숨김 폴더를 생성.</div></div>
+
+  <div class="qa"><div class="q">Q9. 로컬/원격 저장소, remote의 뜻은?</div>
+    <div class="a"><b>답:</b> 로컬=내 컴퓨터 안 / 원격=밖(GitHub 등) / remote=로컬이 아는 다른 저장소의 주소.</div></div>
+
+  <div class="qa"><div class="q">Q10. "Git 필요" vs "GitHub 권한 필요" 차이는?</div>
+    <div class="a"><b>답:</b> Git 필요=로컬 변경 이력 추적·되돌리기 / GitHub 권한=온라인 저장소·Issue·PR·리뷰·Actions.</div></div>
+
+  <div class="qa"><div class="q">Q11. 좋은 커밋 메시지가 왜 중요한가?</div>
+    <div class="a"><b>답:</b> "버그 수정"보다 "로그인 실패 시 토큰 갱신 루프를 막기 위해 만료 조건 추가"가 좋음.</div>
+    <div class="exp">나중에 AI에게 다시 물을 때 강력한 맥락이 됨.</div></div>
+
+  <div class="qa"><div class="q">Q12. git log의 SHA-1 해시란?</div>
+    <div class="a"><b>답:</b> 각 커밋을 고유 식별하는 40자리 16진수. 내용이 바뀌면 해시도 바뀜 → 변조 감지.</div></div>
+
+  <div class="qa"><div class="q">Q13. Git은 누가 왜 만들었나?</div>
+    <div class="a"><b>답:</b> 리눅스 커널이 BitKeeper 사용권을 잃자(2005) <b>Linus Torvalds</b>가 제작.</div>
+    <div class="exp">속도·비선형(브랜치)·완전 분산·대형 프로젝트 처리를 목표로 태어남 = AI 시대와 닮음.</div></div>
+
+  <div class="qa"><div class="q">Q14. 좋은 바이브코딩 흐름을 Git으로 설명하면?</div>
+    <div class="a"><b>답:</b> 작업 전 커밋 → AI에 작은 변경 요청 → <code>git diff</code> → 테스트 → 커밋/되돌리기 → 다른 브랜치.</div></div>
+
+  <div class="qa"><div class="q">Q15. (심화) Git 내부 객체 3가지는?</div>
+    <div class="a"><b>답:</b> blob(파일 내용)·tree(디렉토리 구조)·commit(tree+부모+작성자+메시지).</div>
+    <div class="exp">Git은 파일을 이름이 아니라 <b>내용</b>으로 기억하고 해시로 식별.</div></div>
+
+  <div class="src">이 문서는 위 두 블로그 원문을 바탕으로 팀 학습·퀘스트 대비용으로 정리한 자료입니다. · 원문 마크다운은 같은 폴더 <code>Git-핵심정리.md</code> 참조.</div>
+</div>
+</body>
+</html>
