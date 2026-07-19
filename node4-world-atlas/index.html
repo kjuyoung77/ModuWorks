@@ -4,9 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>세계 국가 도감</title>
+<script>if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark';</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
   :root{--paper:#f4f2ea;--ink:#1c1b18;--muted:#8b8575;--faint:#b7b1a2;--line:#e2ded1;--card:#fbfaf4;--sel:#1c1b18;--star:#b5773a;--sans:'Noto Sans KR',sans-serif;--disp:'Space Grotesk','Noto Sans KR',sans-serif;--radius:14px}
+  html[data-theme="dark"]{--paper:#17150f;--ink:#ece7db;--muted:#9a9384;--faint:#6b6558;--line:#2e2a22;--card:#1e1b14;--sel:#ece7db;--star:#d69a52}
+  html{transition:background .2s}
+  .switches{display:flex;gap:8px;align-items:center}
+  .themebtn{border:1px solid var(--line);background:var(--card);border-radius:999px;width:34px;height:32px;font-size:.95rem;cursor:pointer;line-height:1;display:grid;place-items:center;transition:.15s;color:var(--ink)}
+  .themebtn:hover{border-color:var(--ink)}
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
   a{color:inherit}
@@ -77,14 +83,17 @@
     <div class="mast-top">
       <span class="eyebrow" id="eyebrow">World Atlas · 세계 국가 도감</span>
       <div class="mast-right">
-        <div class="langsw" id="langsw">
-          <button data-l="ko">KO</button><button data-l="en">EN</button>
+        <div class="switches">
+          <div class="langsw" id="langsw">
+            <button data-l="ko">KO</button><button data-l="en">EN</button>
+          </div>
+          <button class="themebtn" id="themebtn" title="다크모드 전환" aria-label="다크모드 전환">🌙</button>
         </div>
         <span class="mast-meta" id="authline">백엔드 연결 확인 중…</span>
       </div>
     </div>
     <h1 class="mast-title" id="mastTitle">세계의 나라들,<br>한 장에 담다.</h1>
-    <p class="mast-sub" id="mastSub">26개국의 국기·수도·인구·면적·언어·종교·통화를 한눈에. 나라를 눌러 상세 페이지로 들어가고, 가봤어요·가고싶어요·댓글로 여행의 기억을 나눠요.</p>
+    <p class="mast-sub" id="mastSub">40개국의 국기·수도·인구·면적·언어·종교·통화를 한눈에. 나라를 눌러 상세 페이지로 들어가고, 가봤어요·가고싶어요·댓글로 여행의 기억을 나눠요.</p>
     <div class="topband" id="topband">
       <div class="tb-lbl" id="tbLbl">🔥 가장 많이 본 나라</div>
       <div class="tb-row" id="tbRow"></div>
@@ -103,7 +112,7 @@
   <footer id="footer">KDT Node · World Atlas — Frontend + Supabase (visits · views · comments · reactions · favorites, RLS)</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js"></script>
+<script src="data.js?v=40c"></script>
 <script>
 // ===== 상태 =====
 const state = { search:"", region:"전체", favOnly:false, popSort:false };
@@ -129,6 +138,12 @@ $search.addEventListener("input", e => { state.search=e.target.value.trim(); ren
 // ===== 언어 토글 =====
 const $langsw = $("langsw");
 $langsw.querySelectorAll("button").forEach(b => b.onclick = () => { if(b.dataset.l===LANG) return; setLang(b.dataset.l); applyStatic(); render(); });
+
+// ===== 다크모드 =====
+const $themebtn = $("themebtn");
+function applyTheme(){ const dark = localStorage.getItem('theme')==='dark'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; }
+$themebtn.onclick = () => { localStorage.setItem('theme', localStorage.getItem('theme')==='dark'?'light':'dark'); applyTheme(); };
+applyTheme();
 function applyStatic(){
   document.documentElement.lang = LANG;
   document.title = t('docTitle');

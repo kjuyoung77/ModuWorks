@@ -4,9 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>세계 국가 도감</title>
+<script>if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark';</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
   :root{--paper:#f4f2ea;--ink:#1c1b18;--muted:#8b8575;--faint:#b7b1a2;--line:#e2ded1;--card:#fbfaf4;--sel:#1c1b18;--star:#b5773a;--sans:'Noto Sans KR',sans-serif;--disp:'Space Grotesk','Noto Sans KR',sans-serif;--radius:14px}
+  html[data-theme="dark"]{--paper:#17150f;--ink:#ece7db;--muted:#9a9384;--faint:#6b6558;--line:#2e2a22;--card:#1e1b14;--sel:#ece7db;--star:#d69a52}
+  .themebtn{border:1px solid var(--line);background:var(--card);border-radius:999px;width:32px;height:29px;font-size:.9rem;cursor:pointer;line-height:1;display:grid;place-items:center;transition:.15s;color:var(--ink)}
+  .themebtn:hover{border-color:var(--ink)}
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
   a{color:inherit}
@@ -44,10 +48,17 @@
   .fact{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
   .fact .k{font-family:var(--disp);color:var(--muted);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;flex:0 0 auto;padding-top:3px}
   .fact .v{text-align:right;font-weight:600}
+  .scaleviz{margin-top:22px;display:grid;gap:11px}
+  .sv-row{display:grid;grid-template-columns:52px 1fr auto;gap:13px;align-items:center}
+  .sv-k{font-family:var(--disp);color:var(--muted);font-size:.7rem;letter-spacing:.05em;text-transform:uppercase}
+  .sv-bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+  .sv-bar i{display:block;height:100%;background:var(--star);border-radius:999px;transition:width .5s ease}
+  .sv-v{font-weight:600;font-size:.86rem;white-space:nowrap}
+  .sv-cap{font-family:var(--disp);font-size:.68rem;color:var(--faint);letter-spacing:.03em;margin-top:2px}
   .place{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start}
   .place .pimg{width:100%;aspect-ratio:4/3;border-radius:12px;background:var(--card) center/cover no-repeat;border:1px solid var(--line)}
   .place h3{margin:0 0 8px;font-size:1.35rem;font-weight:900;letter-spacing:-.01em}
-  .place p{margin:0;color:#3a382f;line-height:1.75}
+  .place p{margin:0;color:var(--ink);line-height:1.75}
   .place .plink{font-family:var(--disp);font-size:.78rem;font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px;display:inline-block;margin-top:14px}
   .place .plink:hover{opacity:.6}
   .fun-card{background:var(--ink);color:var(--paper);border-radius:var(--radius);padding:26px 28px;line-height:1.75;font-size:1.02rem}
@@ -99,13 +110,14 @@
     <a class="back" id="backLink" href="index.html">← 세계 국가 도감</a>
     <div class="topbar-right">
       <div class="langsw" id="langsw"><button data-l="ko">KO</button><button data-l="en">EN</button></div>
+      <button class="themebtn" id="themebtn" title="다크모드 전환" aria-label="다크모드 전환">🌙</button>
       <span class="brand">World Atlas</span>
     </div>
   </div></div>
   <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js"></script>
+<script src="data.js?v=40c"></script>
 <script>
 const code = new URLSearchParams(location.search).get('c');
 const c = code && countryByCode(code);
@@ -115,6 +127,10 @@ let THISVIEWS = null;   // 이 나라 조회수(백엔드)
 
 const $langsw = document.getElementById('langsw');
 $langsw.querySelectorAll("button").forEach(b => b.onclick = () => { if(b.dataset.l===LANG) return; setLang(b.dataset.l); rerender(); });
+const $themebtn = document.getElementById('themebtn');
+function applyTheme(){ const dark = localStorage.getItem('theme')==='dark'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; }
+$themebtn.onclick = () => { localStorage.setItem('theme', localStorage.getItem('theme')==='dark'?'light':'dark'); applyTheme(); };
+applyTheme();
 function applyLangBits(){
   document.documentElement.lang = LANG;
   $langsw.querySelectorAll("button").forEach(b => b.classList.toggle('on', b.dataset.l===LANG));
@@ -152,6 +168,11 @@ function rerender(){
 
 function render(){
   const related = COUNTRIES.filter(x => x.region===c.region && x.id!==c.id);
+  const lp = COUNTRIES.map(x=>Math.log10(x.population)), lpMin=Math.min(...lp), lpMax=Math.max(...lp);
+  const la = COUNTRIES.map(x=>Math.log10(x.area+1)), laMin=Math.min(...la), laMax=Math.max(...la);
+  const pPop = Math.max(3, Math.round((Math.log10(c.population)-lpMin)/(lpMax-lpMin)*100));
+  const pArea = Math.max(3, Math.round((Math.log10(c.area+1)-laMin)/(laMax-laMin)*100));
+  const svCap = LANG==='en' ? 'Relative size among 40 countries (log scale)' : '40개국 대비 상대 규모 (로그 스케일)';
   app.innerHTML = `
     <div class="hero loading" id="hero">
       <div class="hero-in"><div class="wrap">
@@ -184,6 +205,11 @@ function render(){
           <div class="fact"><span class="k">${t('kCur')}</span><span class="v">${esc(L.currency(c))}</span></div>
           <div class="fact"><span class="k">${t('kDial')}</span><span class="v">${esc(c.dial)}</span></div>
           <div class="fact"><span class="k">${t('kViews')}</span><span class="v" id="factViews">…</span></div>
+        </div>
+        <div class="scaleviz">
+          <div class="sv-row"><span class="sv-k">${t('kPop')}</span><div class="sv-bar"><i style="width:${pPop}%"></i></div><span class="sv-v">${fmtPop(c.population)}</span></div>
+          <div class="sv-row"><span class="sv-k">${t('kArea')}</span><div class="sv-bar"><i style="width:${pArea}%"></i></div><span class="sv-v">${fmtArea(c.area)}</span></div>
+          <div class="sv-cap">${esc(svCap)}</div>
         </div>
       </section>
 
@@ -260,7 +286,7 @@ async function loadHero(){
     const pimg = document.getElementById('placeImg'); if(pimg){ pimg.style.backgroundImage = `url("${w.img}")`; pimg.style.backgroundPosition = pos; }
   }
   const pt = document.getElementById('placeText');
-  if(pt){ pt.textContent = (w && w.extract) ? w.extract : (LANG==='en' ? `${L.landmark(c)}, the landmark of ${L.name(c)}.` : `${c.name}의 대표 명소인 ${c.landmark}입니다.`); pt.style.color = "#3a382f"; }
+  if(pt){ pt.textContent = (w && w.extract) ? w.extract : (LANG==='en' ? `${L.landmark(c)}, the landmark of ${L.name(c)}.` : `${c.name}의 대표 명소인 ${c.landmark}입니다.`); pt.style.color = ""; }
 }
 
 // ===== 백엔드 (Supabase) =====
