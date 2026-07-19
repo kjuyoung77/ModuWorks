@@ -48,7 +48,10 @@
   /* sections */
   section.blk{padding:34px 0;border-bottom:1px solid var(--line)}
   .lbl{font-family:var(--disp);font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
-  .lead-txt{font-size:1.18rem;line-height:1.7;letter-spacing:-.01em;max-width:60ch}
+  .lead-txt{font-size:1.18rem;line-height:1.7;letter-spacing:-.01em;max-width:60ch;font-weight:600}
+  .about-txt{margin:18px 0 0;color:var(--muted);line-height:1.85;font-size:1rem;max-width:66ch;white-space:pre-wrap}
+  .about-more{display:inline-block;margin-top:12px;font-family:var(--disp);font-size:.78rem;font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px}
+  .about-more:hover{opacity:.6}
   .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:0 40px}
   .fact{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
   .fact .k{font-family:var(--disp);color:var(--muted);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;flex:0 0 auto;padding-top:3px}
@@ -122,7 +125,7 @@
   <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=41"></script>
+<script src="data.js?v=42"></script>
 <script>
 const code = new URLSearchParams(location.search).get('c');
 const c = code && countryByCode(code);
@@ -159,7 +162,16 @@ function start(){
   document.title = `${L.name(c)} · ${t('docTitle')}`;
   render();
   loadHero();
+  loadAbout();
   initAuth();
+}
+async function loadAbout(){
+  const el = document.getElementById('aboutText'); if(!el) return;
+  const w = await fetchWiki(L.name(c), LANG);
+  if(w && w.extract && w.extract.length > 40){
+    el.textContent = w.extract;
+    const more = document.getElementById('aboutMore'); if(more) more.style.display = 'inline-block';
+  } else { el.style.display = 'none'; }
 }
 // 언어 전환 시: DOM 재구성 + 히어로 다시 로드 + (로그인 상태면) 카운트/댓글 재표시
 function rerender(){
@@ -167,6 +179,7 @@ function rerender(){
   document.title = `${L.name(c)} · ${t('docTitle')}`;
   render();
   loadHero();
+  loadAbout();
   if(me){ loadMarks(); loadComments(); }
   else { updateViewsFact(); }
 }
@@ -197,6 +210,8 @@ function render(){
 
       <section class="blk">
         <p class="lead-txt">${esc(L.desc(c))}</p>
+        <p class="about-txt" id="aboutText">${t('loadingWiki')}</p>
+        <a class="about-more" id="aboutMore" href="https://${LANG}.wikipedia.org/wiki/${encodeURIComponent(L.name(c))}" target="_blank" rel="noopener" style="display:none">${LANG==='en'?'Read more on Wikipedia →':'위키백과에서 더 보기 →'}</a>
       </section>
 
       <section class="blk">
