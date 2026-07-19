@@ -19,6 +19,10 @@
   .wrap{max-width:1160px;margin:auto;padding:0 26px}
   /* masthead */
   header.mast{padding:48px 0 32px;border-bottom:1px solid var(--line)}
+  header.mast .wrap{position:relative}
+  #globe{position:absolute;top:84px;right:-6px;width:360px;height:360px;pointer-events:none;z-index:0}
+  @media(max-width:1000px){ #globe{width:260px;height:260px;top:64px;opacity:.5} }
+  @media(max-width:720px){ #globe{display:none} }
   .mast-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
   .eyebrow{font-family:var(--disp);font-weight:700;font-size:.74rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
   .mast-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
@@ -80,6 +84,7 @@
 </head>
 <body>
   <header class="mast"><div class="wrap">
+    <canvas id="globe" aria-hidden="true"></canvas>
     <div class="mast-top">
       <span class="eyebrow" id="eyebrow">World Atlas · 세계 국가 도감</span>
       <div class="mast-right">
@@ -112,7 +117,7 @@
   <footer id="footer">KDT Node · World Atlas — Frontend + Supabase (visits · views · comments · reactions · favorites, RLS)</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=42"></script>
+<script src="data.js?v=43"></script>
 <script>
 // ===== 상태 =====
 const state = { search:"", region:"전체", favOnly:false, popSort:false };
@@ -141,7 +146,7 @@ $langsw.querySelectorAll("button").forEach(b => b.onclick = () => { if(b.dataset
 
 // ===== 다크모드 =====
 const $themebtn = $("themebtn");
-function applyTheme(){ const dark = localStorage.getItem('theme')==='dark'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; }
+function applyTheme(){ const dark = localStorage.getItem('theme')==='dark'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; if(window.__globeTheme) window.__globeTheme(); }
 $themebtn.onclick = () => { localStorage.setItem('theme', localStorage.getItem('theme')==='dark'?'light':'dark'); applyTheme(); };
 applyTheme();
 function applyStatic(){
@@ -276,6 +281,37 @@ async function toggleMark(code, kind){
 applyStatic();
 render();
 initAuth();
+
+// ===== 마스트헤드 회전 도트 지구본 =====
+(function(){
+  const cv = document.getElementById('globe'); if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let DPR=1, W=0, H=0, R=0, cx=0, cy=0;
+  const N=1300, pts=[];
+  for(let i=0;i<N;i++){ const y=1-(i/(N-1))*2; const r=Math.sqrt(Math.max(0,1-y*y)); const th=i*2.399963; pts.push([Math.cos(th)*r, y, Math.sin(th)*r, i%41===0]); }
+  const tilt=-0.34, ct=Math.cos(tilt), st=Math.sin(tilt);
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let ink=cssVar('--ink')||'#1c1b18', star=cssVar('--star')||'#b5773a';
+  window.__globeTheme = () => { ink=cssVar('--ink')||ink; star=cssVar('--star')||star; };
+  function resize(){ const s=cv.clientWidth||0; DPR=Math.min(window.devicePixelRatio||1,2); cv.width=s*DPR; cv.height=s*DPR; W=cv.width; H=cv.height; R=W*0.42; cx=W/2; cy=H/2; }
+  resize(); addEventListener('resize', resize);
+  let a=0;
+  function frame(){
+    if(W){ ctx.clearRect(0,0,W,H); const ca=Math.cos(a), sa=Math.sin(a);
+      for(const p of pts){
+        const x=p[0]*ca - p[2]*sa, z=p[0]*sa + p[2]*ca, y=p[1];
+        const y2=y*ct - z*st, z2=y*st + z*ct, depth=(z2+1)/2;
+        ctx.globalAlpha=0.10+depth*0.72; ctx.fillStyle=p[3]?star:ink;
+        ctx.beginPath(); ctx.arc(cx+x*R, cy+y2*R, (0.5+depth*1.25)*DPR, 0, 6.2832); ctx.fill();
+      }
+      ctx.globalAlpha=1;
+    }
+    a += reduce?0.0006:0.0016;
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
 </script>
 </body>
 </html>

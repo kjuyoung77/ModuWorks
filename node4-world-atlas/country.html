@@ -125,7 +125,7 @@
   <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=42"></script>
+<script src="data.js?v=43"></script>
 <script>
 const code = new URLSearchParams(location.search).get('c');
 const c = code && countryByCode(code);
@@ -293,6 +293,7 @@ function render(){
       <div class="end"><a href="index.html" style="text-decoration:none">${t('backToAll')}</a></div>
     </div>`;
   updateViewsFact();
+  renderCommentList([]);   // 시드 댓글 먼저 표시(백엔드 연결되면 실제 댓글이 위에 합쳐짐)
 }
 
 function updateViewsFact(){
@@ -368,17 +369,24 @@ async function toggleFav(){
   else  { await sb.from('favorites').insert({user_id:me, code}); }
   loadMarks();
 }
-async function loadComments(){
+function renderCommentList(dbData){
   const list = document.getElementById('cmtList'); if(!list) return;
-  const { data, error } = await sb.from('comments').select('*').eq('code', code).order('created_at', {ascending:false});
-  if(error){ list.innerHTML = `<div class="cmt-empty">${t('cmtFail')}${esc(error.message)}</div>`; return; }
-  if(!data.length){ list.innerHTML = `<div class="cmt-empty">${t('cmtEmpty')}</div>`; return; }
+  const now = Date.now();
+  const seeds = (typeof SEED_COMMENTS!=='undefined' ? (SEED_COMMENTS[code]||[]) : []).map((s,i)=>({
+    id:'seed'+i, nickname:s.n, body:s.b, user_id:'seed', created_at:new Date(now - s.d*86400000).toISOString()
+  }));
+  const all = [...(dbData||[]), ...seeds].sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
+  if(!all.length){ list.innerHTML = `<div class="cmt-empty">${t('cmtEmpty')}</div>`; return; }
   const loc = LANG==='en' ? 'en-US' : 'ko-KR';
-  list.innerHTML = data.map(cm => `<div class="cmt">
+  list.innerHTML = all.map(cm => `<div class="cmt">
       ${cm.user_id===me ? `<button class="del" onclick="delComment(${cm.id})">${t('cmtDel')}</button>` : ""}
       <div class="who">${esc(cm.nickname)}<span class="when">${new Date(cm.created_at).toLocaleDateString(loc,{month:'short',day:'numeric'})}</span></div>
       <div class="txt">${esc(cm.body)}</div>
     </div>`).join("");
+}
+async function loadComments(){
+  const { data, error } = await sb.from('comments').select('*').eq('code', code).order('created_at', {ascending:false});
+  renderCommentList(error ? [] : data);   // 에러여도 시드 댓글은 표시
 }
 async function postComment(){
   const nick = (document.getElementById('cmtNick').value||"").trim(), body = (document.getElementById('cmtBody').value||"").trim();
