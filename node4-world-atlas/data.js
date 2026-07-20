@@ -166,7 +166,7 @@ const I18N = {
   ko: {
     docTitle:"세계 국가 도감", brand:"World Atlas · 세계 국가 도감",
     mastTitle:"세계를,<br>한 장에 펼치다.",
-    mastSub:"40개국의 국기·수도·인구·면적·언어·종교·통화를 한눈에. 나라를 눌러 상세 페이지로 들어가고, 가봤어요·가고싶어요·댓글로 여행의 기억을 나눠요.",
+    mastSub:"40개국의 국기·수도·인구·면적·언어·종교·통화를 한 장에 담았습니다. 나라를 누르면 국기에 담긴 의미부터 대표 명소·여행 정보까지 이어지고, 가봤어요·가고싶어요 버튼과 댓글로 여행의 기억을 나눌 수 있어요. 오른쪽 지구본을 잡고 돌려보세요 — 세계가 손끝에서 움직입니다.",
     searchPh:"나라 이름으로 검색 (예: 프랑스, 브라질)", searchAria:"국가 검색",
     fav:"⭐ 즐겨찾기", popular:"🔥 인기순",
     countCountries:"개 나라", countFav:"⭐ 즐겨찾기", countSearch:"검색",
@@ -196,7 +196,7 @@ const I18N = {
   en: {
     docTitle:"World Atlas", brand:"World Atlas",
     mastTitle:"The World,<br>Unfolded.",
-    mastSub:"Flags, capitals, population, area, languages, religion, and currency for 40 countries at a glance. Tap a country for its page, and share your travel memories with been-there, want-to-go, and comments.",
+    mastSub:"Flags, capitals, population, area, languages, religion, and currency for 40 countries — gathered on a single page. Tap a country to dive into its story, from the meaning woven into its flag to landmarks and travel notes, and leave your mark with been-there, want-to-go, and comments. And go ahead — grab the globe and spin it. The world moves at your fingertips.",
     searchPh:"Search by country name (e.g. France, Brazil)", searchAria:"Search countries",
     fav:"⭐ Favorites", popular:"🔥 Popular",
     countCountries:" countries", countFav:"⭐ Favorites", countSearch:"search",
