@@ -303,7 +303,7 @@ initAuth();
   function resize(){ const s=cv.clientWidth||0; DPR=Math.min(window.devicePixelRatio||1,2); cv.width=s*DPR; cv.height=s*DPR; CW=cv.width; CH=cv.height; R=CW*0.46; cx=CW/2; cy=CH/2; }
   resize(); addEventListener('resize', resize);
   // ===== 상호작용: 드래그로 돌리고, 놓으면 축 복귀 후 자전 =====
-  const TILT=-0.34, autoV=reduce?0.0006:0.0015;
+  const TILT=0.34, autoV=reduce?0.0006:0.0015;
   let angY=0, angX=TILT, dragging=false, lastX=0, lastY=0;
   const pt = e => e.touches && e.touches[0] ? e.touches[0] : e;
   function down(e){ dragging=true; const p=pt(e); lastX=p.clientX; lastY=p.clientY; if(e.cancelable)e.preventDefault(); }
@@ -320,8 +320,8 @@ initAuth();
         const y2=y*ct - z*st, z2=y*st + z*ct;
         if(z2 < -0.05) continue;               // 뒷면 컬링 → 앞 대륙만 선명
         const depth=(z2+1)/2;
-        if(p[3]){ ctx.globalAlpha=Math.min(1,0.34+depth*0.66); ctx.fillStyle=p[4]?star:ink; ctx.beginPath(); ctx.arc(cx-x*R, cy+y2*R, (0.7+depth*1.1)*DPR, 0, 6.2832); ctx.fill(); }
-        else { ctx.globalAlpha=0.06+depth*0.12; ctx.fillStyle=ink; ctx.beginPath(); ctx.arc(cx-x*R, cy+y2*R, (0.4+depth*0.55)*DPR, 0, 6.2832); ctx.fill(); }
+        if(p[3]){ ctx.globalAlpha=Math.min(1,0.34+depth*0.66); ctx.fillStyle=p[4]?star:ink; ctx.beginPath(); ctx.arc(cx-x*R, cy-y2*R, (0.7+depth*1.1)*DPR, 0, 6.2832); ctx.fill(); }
+        else { ctx.globalAlpha=0.06+depth*0.12; ctx.fillStyle=ink; ctx.beginPath(); ctx.arc(cx-x*R, cy-y2*R, (0.4+depth*0.55)*DPR, 0, 6.2832); ctx.fill(); }
       }
       ctx.globalAlpha=1;
     }
