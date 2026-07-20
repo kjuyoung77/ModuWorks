@@ -1,13 +1,14 @@
 # ModuWorks
 
-아이펠 KDT AI 에이전트 과정에서 수행한 **노드 과제**와 **퀘스트** 모음입니다.
+아이펠 KDT AI 에이전트 과정에서 수행한 **노드 과제·실습**과 **퀘스트** 모음입니다.
 루트(`index.html`)가 갤러리이고, 각 프로젝트는 자기 폴더의 `index.html`로 바로 실행·열람됩니다.
+각 폴더 README 상단의 🏷️ 뱃지로 **과제(제출물)·실습·퀘스트**를 구분합니다.
 
 🔗 **갤러리:** https://kjuyoung77.github.io/ModuWorks/
 
 ---
 
-## 🧩 노드 과제 (Node Assignments)
+## 🧩 노드 과제 (Node Assignments) — 루브릭 제출물
 
 ### ⚔️ [소울 던전 (soul-dungeon)](node2-soul-dungeon/) — 노드 2 · 게임
 소울나이트식 탑다운 던전 크롤러. 순수 Canvas(외부 의존성 0).
@@ -20,6 +21,16 @@
 - **Supabase 백엔드(RLS 보안)** — 방문자 수·나라별 조회수(인기순위)·댓글·가봤어요/가고싶어요·즐겨찾기
 - 익명 로그인 → 본인 것만 수정(`auth.uid()`), 방문 로그는 집계 함수(`SECURITY DEFINER`)로만 노출
 - 백엔드 설계는 [`node4-world-atlas/제출_런북.md`](node4-world-atlas/제출_런북.md) 참조
+
+---
+
+## ✅ 노드 실습 (Node Practice) — 따라하기 (제출 과제 아님)
+
+### 📋 [내 Todo 앱 (todo-app)](node5-todo-app/) — 노드 5 · 데이터베이스
+배운 CRUD·관계·RLS를 손에 익히는 실습. 같은 앱을 **로컬(SQLite) / 클라우드(Supabase)** 두 저장소로.
+- 마감일·태그(**다대다 N:M**) 지원, 할 일 추가/완료/삭제(CRUD)
+- 라이브는 **클라우드(Supabase, RLS ON)** 버전 — 새로고침·다른 기기에도 저장
+- 로컬 버전은 clone 후 `node server.js` (Node 내장 SQLite, 빌드 불필요)
 
 ---
 

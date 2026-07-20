@@ -1,5 +1,7 @@
 # 개발 환경 세팅 — 온보딩 / 노드1 (작업대 마련하기)
 
+> 🏷️ **온보딩 · 퀘스트** — 개발환경 세팅 아카이브.
+
 ## ▶ 라이브 문서
 ### 👉 https://kjuyoung77.github.io/ModuWorks/onboarding-git-setup/
 

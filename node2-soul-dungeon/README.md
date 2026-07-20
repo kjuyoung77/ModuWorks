@@ -1,5 +1,7 @@
 # 소울 던전 (Soul Dungeon) — 노드2 · 게임
 
+> 🏷️ **노드 2 · 과제(제출물)** — 바이브코딩 게임 배포 과제.
+
 ## ▶ 라이브 플레이
 ### 👉 https://kjuyoung77.github.io/ModuWorks/node2-soul-dungeon/
 > 화면을 한 번 클릭해 포커스를 준 뒤 조작하세요.

@@ -1,5 +1,7 @@
 # 내 문제를 네 조각으로 — 온보딩 · Computational Thinking
 
+> 🏷️ **온보딩 · 퀘스트** — 컴퓨팅 사고 프로젝트.
+
 ## ▶ 라이브 문서
 ### 👉 https://kjuyoung77.github.io/ModuWorks/onboarding-computational-thinking/
 

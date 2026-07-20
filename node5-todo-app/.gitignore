@@ -1,0 +1,7 @@
+# 강의 규칙: 데이터 파일과 비밀값은 깃에 올리지 않는다
+todo.db
+todo.db-journal
+todo.db-wal
+todo.db-shm
+.env
+node_modules/

@@ -1,5 +1,7 @@
 # Git 핵심 정리 — 퀘스트B · 팀 티칭
 
+> 🏷️ **퀘스트 B · 팀 티칭** — 노션 퀘스트 산출물.
+
 ## ▶ 라이브 문서
 ### 👉 https://kjuyoung77.github.io/ModuWorks/quest-b-git-teaching/
 

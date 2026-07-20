@@ -1,5 +1,7 @@
 # 세계 국가 도감 (World Atlas) — 노드4 · 백엔드 프로젝트
 
+> 🏷️ **노드 4 · 과제(제출물)** — 백엔드 루브릭 제출물.
+
 ## ▶ 라이브 데모
 ### 👉 https://kjuyoung77.github.io/ModuWorks/node4-world-atlas/
 > 상단에 **"👁 누적 방문 · 오늘"** 숫자가 뜨면 백엔드 연결 성공.

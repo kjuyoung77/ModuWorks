@@ -1,5 +1,7 @@
 # 틀린 그림 찾기 — 퀘스트C-1 · 페어프로그래밍
 
+> 🏷️ **퀘스트 C-1 · 페어프로그래밍** — 노션 퀘스트 산출물.
+
 ## ▶ 라이브 플레이
 ### 👉 https://kjuyoung77.github.io/ModuWorks/quest-c1-spot-the-difference/
 

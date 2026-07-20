@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 Todo 앱 · 클라우드(Supabase)</title>
+<style>
+  :root{--bg:#eef3fb;--card:#fff;--ink:#1c1b18;--muted:#6b6a63;--line:#dbe3f0;--accent:#0e7490;--done:#9aa0a6;--danger:#c0392b;--chip:#e0f2fe;--chip-ink:#075985}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo",system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:640px;margin:0 auto;padding:40px 20px 80px}
+  h1{font-size:1.7rem;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 6px}
+  .cloud{display:inline-block;background:var(--chip);color:var(--chip-ink);font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:999px;margin-bottom:20px}
+  form{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px;margin-bottom:20px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  input[type=text],input[type=date]{flex:1;min-width:120px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff;color:var(--ink)}
+  input:focus{outline:none;border-color:var(--accent)}
+  button{font:inherit;cursor:pointer;border:0;border-radius:9px}
+  .add{background:var(--accent);color:#fff;font-weight:700;padding:10px 18px}
+  .add:hover{filter:brightness(1.05)}
+  .filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .filters button{background:transparent;border:1px solid var(--line);color:var(--muted);padding:6px 13px;border-radius:999px;font-size:.85rem}
+  .filters button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+  ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+  li.done .title{text-decoration:line-through;color:var(--done)}
+  .chk{width:22px;height:22px;margin-top:2px;flex:0 0 auto;accent-color:var(--accent);cursor:pointer}
+  .body{flex:1;min-width:0}
+  .title{font-weight:600;word-break:break-all}
+  .meta{margin-top:5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
+  .due{background:#fff3e0;color:#9a5b00;border-radius:6px;padding:1px 7px;font-weight:600}
+  .due.over{background:#fdecea;color:var(--danger)}
+  .chip{background:var(--chip);color:var(--chip-ink);border-radius:999px;padding:1px 9px;font-weight:600}
+  .del{background:transparent;color:var(--muted);font-size:1.1rem;padding:2px 6px;line-height:1}
+  .del:hover{color:var(--danger)}
+  .empty{text-align:center;color:var(--muted);padding:40px 0}
+  .count{font-size:.82rem;color:var(--muted);margin:0 0 10px}
+  .err{background:#fdecea;color:#a12;border:1px solid #f5c6cb;border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:.85rem;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📋 내 Todo 앱</h1>
+  <p class="sub">클라우드 DB(Supabase Postgres)에 저장 — 어디서든 링크로 접속.</p>
+  <span class="cloud">☁️ CLOUD · RLS ON · 노드5 실습 3부</span>
+
+  <div class="err" id="err"></div>
+
+  <form id="form">
+    <input type="text" id="title" placeholder="할 일을 입력하세요…" autocomplete="off" required>
+    <div class="row">
+      <input type="date" id="due" title="마감일(선택)">
+      <input type="text" id="tags" placeholder="태그: 쉼표로 구분 (예: 공부, 급함)" autocomplete="off">
+      <button type="submit" class="add">추가</button>
+    </div>
+  </form>
+
+  <div class="filters">
+    <button data-f="all" class="on">전체</button>
+    <button data-f="active">남은 것</button>
+    <button data-f="done">완료</button>
+    <button data-f="today">오늘 마감</button>
+  </div>
+
+  <p class="count" id="count"></p>
+  <ul id="list"></ul>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+// ⚠️ publishable(anon) 키는 '브라우저 공개용'이라 여기 둬도 안전합니다.
+//    진짜 보호는 DB의 RLS(행 수준 보안). secret 키였다면 절대 여기 두면 안 됨(.env로).
+const SUPABASE_URL = 'https://fckktjzfjzjnjrbpautk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_b9uy0UWer4zUf8qq1lUPbQ_6RgxeU9x';
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let todos = [], filter = 'all';
+const $ = id => document.getElementById(id);
+const todayStr = () => new Date().toLocaleDateString('sv-SE');
+const showErr = m => { const e=$('err'); e.textContent='⚠️ '+m; e.style.display='block'; };
+
+async function load(){
+  const { data, error } = await sb
+    .from('todos')
+    .select('id,title,is_done,due_date,created_at, todo_tags(tags(name))')
+    .order('is_done', {ascending:true})
+    .order('due_date', {ascending:true, nullsFirst:false})
+    .order('created_at', {ascending:false});
+  if(error){ showErr('불러오기 실패: '+error.message); return; }
+  todos = data.map(t => ({...t, tags: (t.todo_tags||[]).map(x=>x.tags?.name).filter(Boolean)}));
+  render();
+}
+
+function visible(){
+  if(filter==='active') return todos.filter(t=>!t.is_done);
+  if(filter==='done')   return todos.filter(t=>t.is_done);
+  if(filter==='today')  return todos.filter(t=>t.due_date===todayStr());
+  return todos;
+}
+
+function render(){
+  const list=$('list'); list.innerHTML='';
+  const items=visible();
+  const remain=todos.filter(t=>!t.is_done).length;
+  $('count').textContent=`전체 ${todos.length}개 · 남은 일 ${remain}개`;
+  if(!items.length){ list.innerHTML='<div class="empty">🍃 표시할 할 일이 없어요.</div>'; return; }
+  for(const t of items){
+    const li=document.createElement('li');
+    if(t.is_done) li.className='done';
+    const over=t.due_date && !t.is_done && t.due_date<todayStr();
+    li.innerHTML=`
+      <input type="checkbox" class="chk" ${t.is_done?'checked':''}>
+      <div class="body">
+        <div class="title"></div>
+        <div class="meta">
+          ${t.due_date?`<span class="due ${over?'over':''}">📅 ${t.due_date}${over?' (지남)':''}</span>`:''}
+          ${t.tags.map(x=>`<span class="chip">#${escapeHtml(x)}</span>`).join('')}
+        </div>
+      </div>
+      <button class="del" title="삭제">✕</button>`;
+    li.querySelector('.title').textContent=t.title;
+    li.querySelector('.chk').onchange=()=>toggle(t.id,!t.is_done);
+    li.querySelector('.del').onclick=()=>remove(t.id);
+    list.appendChild(li);
+  }
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+$('form').onsubmit=async e=>{
+  e.preventDefault();
+  const title=$('title').value.trim(); if(!title) return;
+  const tagNames=$('tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+  // 1) 할 일 추가
+  const { data:todo, error:e1 } = await sb.from('todos')
+    .insert({title, due_date:$('due').value||null}).select('id').single();
+  if(e1){ showErr('추가 실패: '+e1.message); return; }
+  // 2) 태그 upsert(중복이면 무시) → 3) 연결표에 짝 저장 (다대다)
+  for(const name of tagNames){
+    const { data:tag, error:e2 } = await sb.from('tags')
+      .upsert({name},{onConflict:'name'}).select('id').single();
+    if(e2){ showErr('태그 실패: '+e2.message); continue; }
+    await sb.from('todo_tags').upsert({todo_id:todo.id, tag_id:tag.id});
+  }
+  e.target.reset(); $('title').focus();
+  load();
+};
+
+async function toggle(id,is_done){
+  const { error }=await sb.from('todos').update({is_done}).eq('id',id);
+  if(error){ showErr('수정 실패: '+error.message); return; } load();
+}
+async function remove(id){
+  const { error }=await sb.from('todos').delete().eq('id',id);
+  if(error){ showErr('삭제 실패: '+error.message); return; } load();
+}
+
+document.querySelectorAll('.filters button').forEach(b=>{
+  b.onclick=()=>{ filter=b.dataset.f; document.querySelectorAll('.filters button').forEach(x=>x.classList.toggle('on',x===b)); render(); };
+});
+
+load();
+</script>
+</body>
+</html>
