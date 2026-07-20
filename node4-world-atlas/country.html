@@ -108,8 +108,36 @@
   .notfound{text-align:center;padding:120px 20px}
   .notfound h1{font-size:2rem;margin:0 0 12px}
   .notfound a{font-weight:700}
+  /* sub-nav (섹션 바로가기, 스티키) */
+  .subnav{position:sticky;top:56px;z-index:4;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin:0 -26px;padding:0 26px}
+  .subnav .wrap2{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:10px 0}
+  .subnav .wrap2::-webkit-scrollbar{display:none}
+  .subnav a{flex:0 0 auto;font-family:var(--disp);font-size:.76rem;font-weight:700;letter-spacing:.02em;color:var(--muted);text-decoration:none;padding:7px 13px;border-radius:999px;border:1px solid transparent;white-space:nowrap;transition:.15s}
+  .subnav a:hover{color:var(--ink);border-color:var(--line)}
+  .subnav a.active{color:var(--paper);background:var(--sel);border-color:var(--sel)}
+  /* stat cards (사람·경제) */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+  .statcard{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--card)}
+  .statcard .sc-k{font-family:var(--disp);font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .statcard .sc-v{font-family:var(--serif);font-style:italic;font-weight:500;font-size:1.7rem;line-height:1.1;margin-top:8px}
+  .statcard .sc-sub{font-size:.74rem;color:var(--faint);margin-top:4px}
+  /* neighbor chips */
+  .nbrs{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .nbr{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 13px 6px 8px;text-decoration:none;color:inherit;font-size:.86rem;transition:.15s;background:var(--card)}
+  .nbr:hover{border-color:var(--ink);transform:translateY(-1px)}
+  .nbr.static{opacity:.72;cursor:default}
+  .nbr.static:hover{transform:none;border-color:var(--line)}
+  .nbr img{height:14px;width:auto;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  /* prose (wiki 주제 요약) */
+  .prose{color:var(--muted);line-height:1.85;font-size:1rem;max-width:70ch;white-space:pre-wrap}
+  .prose.empty{color:var(--faint);font-style:italic}
+  .srcline{font-family:var(--disp);font-size:.68rem;letter-spacing:.03em;color:var(--faint);margin-top:14px}
+  .srcline a{border-bottom:1px solid var(--line)}
+  .miniloc{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .miniloc .coord{font-family:var(--disp);font-size:.9rem;color:var(--ink)}
   @media(max-width:640px){
     .wrap{padding:0 18px}
+    .subnav{margin:0 -18px;padding:0 18px}
     .facts{grid-template-columns:1fr;gap:0}
     .place{grid-template-columns:1fr}
     .place .pimg{aspect-ratio:16/9}
@@ -128,7 +156,8 @@
   <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=45"></script>
+<script src="atlas-data.js?v=1"></script>
+<script src="data.js?v=47"></script>
 <script>
 const code = new URLSearchParams(location.search).get('c');
 const c = code && countryByCode(code);
@@ -166,6 +195,8 @@ function start(){
   render();
   loadHero();
   loadAbout();
+  loadTopics();
+  initSubnavSpy();
   initAuth();
 }
 async function loadAbout(){
@@ -176,6 +207,36 @@ async function loadAbout(){
     const more = document.getElementById('aboutMore'); if(more) more.style.display = 'inline-block';
   } else { el.style.display = 'none'; }
 }
+// ===== 인접국 칩 =====
+function nbrChip(n){
+  if(n.inAtlas){ const cc=countryByCode(n.code); const nm=cc?L.name(cc):n.name; return `<a class="nbr" href="country.html?c=${n.code}"><img src="flags/${n.code}.svg" alt="">${esc(nm)}</a>`; }
+  return `<span class="nbr static">🌐 ${esc(n.name)}</span>`;
+}
+// ===== 주제별 위키백과 요약(지리·역사·문화) — 런타임 fetch + 폴백 =====
+function wikiTopics(){
+  if(LANG==='en'){ const n=c.nameEn; return {geo:`Geography of ${n}`, hist:`History of ${n}`, cult:`Culture of ${n}`}; }
+  const n=c.name; return {geo:`${n}의 지리`, hist:`${n}의 역사`, cult:`${n}의 문화`};
+}
+async function loadTopic(title, textId, srcId){
+  const el=document.getElementById(textId); if(!el) return;
+  const w=await fetchWiki(title, LANG);
+  if(w && w.extract && w.extract.length>40){
+    el.textContent=w.extract; el.classList.remove('empty');
+    const s=document.getElementById(srcId); if(s) s.innerHTML=`${t('srcWiki')} · <a href="${w.url||('https://'+LANG+'.wikipedia.org/wiki/'+encodeURIComponent(title))}" target="_blank" rel="noopener">${esc(w.title||title)}</a>`;
+  } else { el.textContent=t('noData'); el.classList.add('empty'); }
+}
+function loadTopics(){ const tp=wikiTopics(); loadTopic(tp.geo,'geoText','geoSrc'); loadTopic(tp.hist,'histText','histSrc'); loadTopic(tp.cult,'cultText','cultSrc'); }
+// ===== 서브내비 스크롤 스파이 =====
+let spyOn=false;
+function initSubnavSpy(){
+  if(spyOn) return; spyOn=true;
+  addEventListener('scroll', ()=>{
+    const links=[...document.querySelectorAll('.subnav a')]; if(!links.length) return;
+    const y=scrollY+140; let cur=null;
+    links.forEach(a=>{ const s=document.querySelector(a.getAttribute('href')); if(s && s.offsetTop<=y) cur=a; });
+    links.forEach(a=>a.classList.toggle('active', a===cur));
+  }, {passive:true});
+}
 // 언어 전환 시: DOM 재구성 + 히어로 다시 로드 + (로그인 상태면) 카운트/댓글 재표시
 function rerender(){
   applyLangBits();
@@ -183,12 +244,14 @@ function rerender(){
   render();
   loadHero();
   loadAbout();
+  loadTopics();
   if(me){ loadMarks(); loadComments(); }
   else { updateViewsFact(); }
 }
 
 function render(){
   const related = COUNTRIES.filter(x => x.region===c.region && x.id!==c.id);
+  const M = atlasMeta(code);
   const lp = COUNTRIES.map(x=>Math.log10(x.population)), lpMin=Math.min(...lp), lpMax=Math.max(...lp);
   const la = COUNTRIES.map(x=>Math.log10(x.area+1)), laMin=Math.min(...la), laMax=Math.max(...la);
   const pPop = Math.max(3, Math.round((Math.log10(c.population)-lpMin)/(lpMax-lpMin)*100));
@@ -211,16 +274,28 @@ function render(){
         <b>${esc(L.name(c))}</b>
       </nav>
 
-      <section class="blk">
+      <nav class="subnav"><div class="wrap2" id="subnav">
+        <a href="#s-overview">${t('ovOverview')}</a>
+        <a href="#s-glance">${t('secAtaGlance')}</a>
+        <a href="#s-geo">${t('secGeo')}</a>
+        <a href="#s-hist">${t('secHist')}</a>
+        <a href="#s-cult">${t('secCult')}</a>
+        <a href="#s-people">${t('secPeople')}</a>
+        <a href="#s-econ">${t('secEcon')}</a>
+        <a href="#s-places">${t('secPlaces')}</a>
+      </div></nav>
+
+      <section class="blk" id="s-overview">
         <p class="lead-txt">${esc(L.desc(c))}</p>
         <p class="about-txt" id="aboutText">${t('loadingWiki')}</p>
         <a class="about-more" id="aboutMore" href="https://${LANG}.wikipedia.org/wiki/${encodeURIComponent(L.name(c))}" target="_blank" rel="noopener" style="display:none">${LANG==='en'?'Read more on Wikipedia →':'위키백과에서 더 보기 →'}</a>
       </section>
 
-      <section class="blk">
-        <div class="lbl">${t('ovOverview')}</div>
+      <section class="blk" id="s-glance">
+        <div class="lbl">${t('secAtaGlance')}</div>
         <div class="facts">
           <div class="fact"><span class="k">${t('kCapital')}</span><span class="v">${esc(L.capital(c))}</span></div>
+          ${M&&M.subregion?`<div class="fact"><span class="k">${t('kSubregion')}</span><span class="v">${esc(M.subregion)}</span></div>`:''}
           <div class="fact"><span class="k">${t('kPop')}</span><span class="v">${fmtPop(c.population)}</span></div>
           <div class="fact"><span class="k">${t('kArea')}</span><span class="v">${fmtArea(c.area)}</span></div>
           <div class="fact"><span class="k">${t('kLang')}</span><span class="v">${esc(L.languages(c))}</span></div>
@@ -236,7 +311,56 @@ function render(){
         </div>
       </section>
 
-      <section class="blk">
+      <section class="blk" id="s-geo">
+        <div class="lbl">${t('secGeo')}</div>
+        <div class="miniloc">
+          ${M&&M.latlng?`<span class="coord">📍 ${M.latlng[0].toFixed(1)}, ${M.latlng[1].toFixed(1)}</span>
+            <a class="plink" href="https://www.openstreetmap.org/#map=4/${M.latlng[0]}/${M.latlng[1]}" target="_blank" rel="noopener">${t('openMap')}</a>`:''}
+          <span class="tag">${M?(M.landlocked?t('vLandlockedY'):t('vLandlockedN')):''}</span>
+        </div>
+        ${M&&M.neighbors&&M.neighbors.length ? `<div style="margin-top:16px"><div class="sv-k" style="margin-bottom:8px;font-family:var(--disp);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-size:.7rem">${t('kNaviBorders')}</div><div class="nbrs">${M.neighbors.map(nbrChip).join('')}</div></div>` : `<p class="prose empty" style="margin-top:12px">${t('noNeighbors')}</p>`}
+        <p class="prose" id="geoText" style="margin-top:18px">${t('loadingWiki')}</p>
+        <div class="srcline" id="geoSrc"></div>
+      </section>
+
+      <section class="blk" id="s-hist">
+        <div class="lbl">${t('secHist')}</div>
+        <p class="prose" id="histText">${t('loadingWiki')}</p>
+        <div class="srcline" id="histSrc"></div>
+      </section>
+
+      <section class="blk" id="s-cult">
+        <div class="lbl">${t('secCult')}</div>
+        <div class="facts" style="margin-bottom:6px">
+          <div class="fact"><span class="k">${t('kLang')}</span><span class="v">${esc(L.languages(c))}</span></div>
+          <div class="fact"><span class="k">${t('kRel')}</span><span class="v">${esc(L.religion(c))}</span></div>
+        </div>
+        <p class="prose" id="cultText">${t('loadingWiki')}</p>
+        <div class="srcline" id="cultSrc"></div>
+      </section>
+
+      <section class="blk" id="s-people">
+        <div class="lbl">${t('secPeople')}</div>
+        <div class="stat-grid">
+          <div class="statcard"><div class="sc-k">${t('kPop')}</div><div class="sc-v">${fmtPop(c.population)}</div></div>
+          ${M&&M.econ&&M.econ.lifeExp?`<div class="statcard"><div class="sc-k">${t('kLifeExp')}</div><div class="sc-v">${M.econ.lifeExp} ${t('yearsUnit')}</div></div>`:''}
+          ${M&&M.econ&&M.econ.urban?`<div class="statcard"><div class="sc-k">${t('kUrban')}</div><div class="sc-v">${M.econ.urban}%</div></div>`:''}
+          ${M&&M.demonym?`<div class="statcard"><div class="sc-k">${t('kDemonym')}</div><div class="sc-v" style="font-size:1.2rem">${esc(M.demonym)}</div></div>`:''}
+        </div>
+        ${M&&M.econ&&M.econ.year?`<div class="srcline">${t('srcWB')} · ${M.econ.year}</div>`:''}
+      </section>
+
+      <section class="blk" id="s-econ">
+        <div class="lbl">${t('secEcon')}</div>
+        <div class="stat-grid">
+          ${M&&M.econ&&M.econ.gdp?`<div class="statcard"><div class="sc-k">${t('kGDP')}</div><div class="sc-v">${fmtUSD(M.econ.gdp)}</div><div class="sc-sub">${M.econ.year||''}</div></div>`:''}
+          ${M&&M.econ&&M.econ.gdppc?`<div class="statcard"><div class="sc-k">${t('kGDPpc')}</div><div class="sc-v">${fmtUSD(M.econ.gdppc)}</div><div class="sc-sub">${M.econ.year||''}</div></div>`:''}
+          <div class="statcard"><div class="sc-k">${t('kCur')}</div><div class="sc-v" style="font-size:1.15rem">${esc(L.currency(c))}</div></div>
+        </div>
+        ${M&&M.econ&&M.econ.gdp?`<div class="srcline">${t('srcWB')}</div>`:''}
+      </section>
+
+      <section class="blk" id="s-flag">
         <div class="lbl">${LANG==='en'?'The Flag':'국기 이야기'}</div>
         <div class="flagblk">
           <img class="fimg" src="flags/${code}.svg" alt="${esc(L.name(c))} 국기">
@@ -254,7 +378,7 @@ function render(){
         <div class="authline" id="authline">${t('beChecking')}</div>
       </section>
 
-      <section class="blk">
+      <section class="blk" id="s-places">
         <div class="lbl">${t('ovLandmark')}</div>
         <div class="place">
           <div class="pimg" id="placeImg"></div>
@@ -306,22 +430,27 @@ function updateViewsFact(){
 
 // ===== 히어로/명소 이미지 (위키백과: 현재 언어) =====
 async function loadHero(){
-  const heroTitle = LANG==='en' ? (c.heroTitleEn || L.landmark(c)) : (c.heroTitle || c.landmark);
-  let hi = await fetchWiki(heroTitle, LANG);
-  // 명소 해설은 landmark 기준 (heroTitle override 시 별도 조회)
-  let extract = (hi && hi.extract) || "";
-  if(c.heroTitle || c.heroTitleEn){ const lm = await fetchWiki(L.landmark(c), LANG); if(lm){ if(lm.extract) extract = lm.extract; if(!hi || !hi.img) hi = lm; } }
-  const isFlag = u => !u || /Flag_of|\.svg(\?|$)/i.test(u);   // 국기/벡터는 히어로에서 제외
-  if(!hi || !hi.img || isFlag(hi.img)){ const w2 = await fetchWiki(L.name(c), LANG); if(w2 && w2.img && !isFlag(w2.img)) hi = { ...(hi||{}), img: w2.img, extract: extract || w2.extract }; }
   const hero = document.getElementById('hero'); if(!hero) return;
   const pos = c.heroPos || 'center 35%';
-  if(hi && hi.img){
-    const im = new Image();
-    im.onload = () => { hero.style.backgroundImage = `url("${hi.img}")`; hero.style.backgroundPosition = pos; hero.classList.remove('loading'); };
-    im.src = hi.img;
-    const hc = document.getElementById('heroCredit'); if(hc) hc.textContent = t('photoCredit');
-    const pimg = document.getElementById('placeImg'); if(pimg){ pimg.style.backgroundImage = `url("${hi.img}")`; pimg.style.backgroundPosition = pos; }
+  const isFlag = u => !u || /Flag_of|\.svg(\?|$)/i.test(u);   // 국기/벡터는 히어로에서 제외
+  // 1) 히어로 이미지 — 큐레이션된 c.heroImg(각 나라 대표 실사)를 우선. 없을 때만 위키 폴백.
+  let img = c.heroImg || null;
+  if(!img){
+    const heroTitle = LANG==='en' ? (c.heroTitleEn || L.landmark(c)) : (c.heroTitle || c.landmark);
+    let hi = await fetchWiki(heroTitle, LANG);
+    if(!hi || !hi.img || isFlag(hi.img)){ const w2 = await fetchWiki(L.name(c), LANG); if(w2 && w2.img && !isFlag(w2.img)) hi = w2; }
+    if(hi && hi.img && !isFlag(hi.img)) img = hi.img;
   }
+  if(img){
+    const im = new Image();
+    im.onload = () => { hero.style.backgroundImage = `url("${img}")`; hero.style.backgroundPosition = pos; hero.classList.remove('loading'); };
+    im.src = img;
+    const hc = document.getElementById('heroCredit'); if(hc) hc.textContent = t('photoCredit');
+    const pimg = document.getElementById('placeImg'); if(pimg){ pimg.style.backgroundImage = `url("${img}")`; pimg.style.backgroundPosition = pos; }
+  }
+  // 2) 대표 명소 해설 — landmark 기준 위키 요약(있으면).
+  const lm = await fetchWiki(L.landmark(c), LANG);
+  const extract = (lm && lm.extract) || "";
   const pt = document.getElementById('placeText');
   if(pt){ pt.textContent = extract || (LANG==='en' ? `${L.landmark(c)}, the landmark of ${L.name(c)}.` : `${c.name}의 대표 명소인 ${c.landmark}입니다.`); pt.style.color = ""; }
 }
