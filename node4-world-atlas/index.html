@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>세계 국가 도감</title>
-<script>if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark';</script>
+<title>World Atlas</title>
+<script>if(localStorage.getItem('theme')!=='light')document.documentElement.dataset.theme='dark';</script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
-  :root{--paper:#f4f2ea;--ink:#1c1b18;--muted:#8b8575;--faint:#b7b1a2;--line:#e2ded1;--card:#fbfaf4;--sel:#1c1b18;--star:#b5773a;--sans:'Noto Sans KR',sans-serif;--disp:'Space Grotesk','Noto Sans KR',sans-serif;--radius:14px}
-  html[data-theme="dark"]{--paper:#17150f;--ink:#ece7db;--muted:#9a9384;--faint:#6b6558;--line:#2e2a22;--card:#1e1b14;--sel:#ece7db;--star:#d69a52}
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,500&family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
+  :root{--paper:#f4f2ea;--ink:#1c1b18;--muted:#8b8575;--faint:#b7b1a2;--line:#e2ded1;--card:#fbfaf4;--sel:#1c1b18;--star:#b5773a;--sans:'Noto Sans KR',sans-serif;--disp:'Space Grotesk','Noto Sans KR',sans-serif;--serif:'Fraunces',Georgia,serif;--radius:14px}
+  html[data-theme="dark"]{--paper:#100f0c;--ink:#f0ebdf;--muted:#948d7e;--faint:#615b50;--line:#2a2620;--card:#191713;--sel:#f0ebdf;--star:#dda15e}
   html{transition:background .2s}
   .switches{display:flex;gap:8px;align-items:center}
   .themebtn{border:1px solid var(--line);background:var(--card);border-radius:999px;width:34px;height:32px;font-size:.95rem;cursor:pointer;line-height:1;display:grid;place-items:center;transition:.15s;color:var(--ink)}
@@ -28,13 +28,15 @@
   .eyebrow{font-family:var(--disp);font-weight:700;font-size:.74rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
   .mast-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
   .mast-meta{font-family:var(--disp);font-size:.72rem;letter-spacing:.03em;color:var(--muted);text-align:right}
-  .mast-meta b{color:var(--ink);font-weight:700}
+  .mast-meta b{color:var(--ink);font-weight:500;font-family:var(--serif);font-style:italic;font-size:1.05em}
   /* language switch */
   .langsw{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
   .langsw button{font-family:var(--disp);font-weight:700;font-size:.72rem;letter-spacing:.06em;border:0;background:transparent;color:var(--muted);padding:6px 13px;cursor:pointer;transition:.15s}
   .langsw button.on{background:var(--sel);color:var(--paper)}
   .mast-title{font-weight:900;font-size:clamp(2.1rem,7.4vw,5.6rem);line-height:1.02;letter-spacing:-.025em;margin:30px 0 0}
+  .mast-title em{font-style:normal}
   html[lang="en"] .mast-title{text-transform:uppercase;letter-spacing:-.01em}
+  html[lang="en"] .mast-title em{font-family:var(--serif);font-style:italic;font-weight:400;text-transform:none;letter-spacing:-.005em}
   .mast-sub{color:var(--muted);font-size:1rem;max-width:62ch;margin:18px 0 0;line-height:1.75}
   /* top viewed band */
   .topband{margin:26px 0 0;padding:16px 0 0;display:none}
@@ -58,11 +60,13 @@
   .chip.fav.on{background:var(--star);border-color:var(--star);color:#fff}
   .chip.pop.on{background:var(--star);border-color:var(--star);color:#fff}
   .count{font-family:var(--disp);color:var(--muted);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin:24px 0 14px}
-  .count b{color:var(--ink)}
+  .count b{color:var(--ink);font-family:var(--serif);font-style:italic;font-weight:500;font-size:1.35em;letter-spacing:0}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:16px;padding-bottom:64px}
   .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;cursor:pointer;transition:.15s;text-align:left;text-decoration:none;color:inherit;display:block}
   .card:hover{transform:translateY(-2px);border-color:var(--ink)}
-  .card .flag{height:30px;width:auto;border-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.14);display:block}
+  .card .idx{display:block;font-family:var(--serif);font-style:italic;font-weight:500;font-size:.95rem;color:var(--faint);letter-spacing:.01em;margin-bottom:12px}
+  .card .flag{height:30px;width:auto;border-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.14);display:block;transition:transform .25s ease}
+  .card:hover .flag{transform:scale(1.06)}
   .card h3{margin:16px 0 3px;font-size:1.2rem;font-weight:700;letter-spacing:-.01em}
   .card .en{font-family:var(--disp);color:var(--muted);font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
   .cviews{margin-left:auto;align-self:center;font-family:var(--disp);font-size:.74rem;color:var(--faint);white-space:nowrap}
@@ -87,7 +91,7 @@
   <header class="mast"><div class="wrap">
     <canvas id="globe" aria-hidden="true"></canvas>
     <div class="mast-top">
-      <span class="eyebrow" id="eyebrow">World Atlas · 세계 국가 도감</span>
+      <span class="eyebrow" id="eyebrow">World Atlas</span>
       <div class="mast-right">
         <div class="switches">
           <div class="langsw" id="langsw">
@@ -98,8 +102,8 @@
         <span class="mast-meta" id="authline">백엔드 연결 확인 중…</span>
       </div>
     </div>
-    <h1 class="mast-title" id="mastTitle">세계의 나라들,<br>한 장에 담다.</h1>
-    <p class="mast-sub" id="mastSub">40개국의 국기·수도·인구·면적·언어·종교·통화를 한 장에 담았습니다. 나라를 누르면 국기에 담긴 의미부터 대표 명소·여행 정보까지 이어지고, 가봤어요·가고싶어요 버튼과 댓글로 여행의 기억을 나눌 수 있어요. 오른쪽 지구본을 잡고 돌려보세요 — 세계가 손끝에서 움직입니다.</p>
+    <h1 class="mast-title" id="mastTitle">The World,<br><em>Unfolded.</em></h1>
+    <p class="mast-sub" id="mastSub">Flags, capitals, population, area, languages, religion, and currency for 40 countries — gathered on a single page. Tap a country to dive into its story, from the meaning woven into its flag to landmarks and travel notes, and leave your mark with been-there, want-to-go, and comments. And go ahead — grab the globe and spin it. The world moves at your fingertips.</p>
     <div class="topband" id="topband">
       <div class="tb-lbl" id="tbLbl">🔥 가장 많이 본 나라</div>
       <div class="tb-row" id="tbRow"></div>
@@ -108,7 +112,7 @@
 
   <div class="wrap">
     <div class="controls">
-      <input id="search" class="search" type="text" placeholder="나라 이름으로 검색 (예: 프랑스, 브라질)" aria-label="국가 검색">
+      <input id="search" class="search" type="text" placeholder="Search by country name (e.g. France, Brazil)" aria-label="Search countries">
       <div class="chips" id="chips"></div>
     </div>
     <p class="count" id="count"></p>
@@ -118,7 +122,7 @@
   <footer id="footer">KDT Node · World Atlas — Frontend + Supabase (visits · views · comments · reactions · favorites, RLS)</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=44"></script>
+<script src="data.js?v=45"></script>
 <script>
 // ===== 상태 =====
 const state = { search:"", region:"전체", favOnly:false, popSort:false };
@@ -147,7 +151,7 @@ $langsw.querySelectorAll("button").forEach(b => b.onclick = () => { if(b.dataset
 
 // ===== 다크모드 =====
 const $themebtn = $("themebtn");
-function applyTheme(){ const dark = localStorage.getItem('theme')==='dark'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; if(window.__globeTheme) window.__globeTheme(); }
+function applyTheme(){ const dark = localStorage.getItem('theme')!=='light'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; if(window.__globeTheme) window.__globeTheme(); }
 $themebtn.onclick = () => { localStorage.setItem('theme', localStorage.getItem('theme')==='dark'?'light':'dark'); applyTheme(); };
 applyTheme();
 function applyStatic(){
@@ -175,11 +179,12 @@ function filtered(){
   });
 }
 
-function card(c){
+function card(c, i){
   const code = flagCode(c.flag);
   const v = views(code);
   return `<a class="card" href="country.html?c=${code}">
     <button class="starbtn ${FAVS.has(code)?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleFav('${code}')" title="${t('fav')}" aria-label="${t('fav')}">${FAVS.has(code)?'★':'☆'}</button>
+    <span class="idx">${String((i||0)+1).padStart(2,'0')}</span>
     <img class="flag" src="flags/${code}.svg" alt="${esc(L.name(c))}" loading="lazy">
     <h3>${esc(L.name(c))}</h3>
     <div class="en">${esc(LANG==='en'?c.name:c.nameEn)}</div>
@@ -217,7 +222,7 @@ function render(){
   const suffix = state.favOnly ? ` · ${t('countFav')}` : (state.popSort ? ` · ${t('popular')}` : (state.region!=="전체" ? ` · ${esc(regionLabel(state.region))}` : ""));
   $count.innerHTML = `<b>${list.length}</b>${t('countCountries')}` + suffix + (state.search?` · "${esc(state.search)}" ${t('countSearch')}`:"");
   if(list.length===0){ $grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${t('empty')}</div>`; renderTopBand(); return; }
-  $grid.innerHTML = list.map(card).join("");
+  $grid.innerHTML = list.map((c,i)=>card(c,i)).join("");
   renderTopBand();
 }
 
@@ -288,9 +293,47 @@ initAuth();
   const cv = document.getElementById('globe'); if(!cv) return;
   const ctx = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // 저해상 육지 마스크(72×36, 세계지도에서 추출한 hex → 비트). 1=육지
-  const MW=72, MH=36;
-  const HEX="0000000000000000000000000000000000000000bbff03002080000018d07f00027ffdc09fffd27c01f7ffffff1fffc62003fffffffe087f8d0017ffffff18003fff803fffffff90001fdec01fffffff00001fdc003bcffffc80001ff8003dfffff500000ff0003c1ffff000000380007ffffff000000198007fef3fe0000001c0007ffe19c00000003400fffc11c000000017807ffc010800000007c003f801200000000ff003f000a10000000ff803f0001980000007f803f0000280000003f003f4000f80000003f001e4001fc0000003c001c0001fc0000003c000c00019c00000070000000000c2000002000000000000000006000000000000000004000000000000000000000000000000000000000000000000000000000300000307ffc00000cb00fffffffffcffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+  // 육지 마스크(144×72, NASA 등장방형 세계지도에서 정밀 샘플 → hex 비트). 1=육지.
+  // 대륙 형태 재정밀화: 북↔남미(중앙아메리카 지협)·이베리아↔북아프리카(지브롤터) 연결 확인됨.
+  const MW=144, MH=72;
+  const HEX=`
+800000000000000000000000000000000001000000000000000000000000000000000000
+0000000000000000000000000000000000000000000027ffffff80000000000400000000
+000000017fffffff0007c000000700000000000000f8df8fffff800200008007f8018000
+000003e4ff807fff000000070effff71f800807003feeff03fff000070061fffffffff81
+83fffffefb783ffe0003ff3ffffffffffffff7fffffffe7e3fc1c007ffffffffffffffff
+27fffffffe7c1f01c01fffffffffffffffff07ffffffe0700e00003efffffffffffffffd
+03f0ffffe07e0000023ffffffffffffffdc001c03ffffc7f0000071effffffffffff0380
+00001fffffffc0000fbfffffffffffff830000000fffffffc0000bffffffffffffffc200
+000007fffffee00003ffffffffffffff8000000003fffbfe000001fffffffffffffe0000
+000003fffffe000007fff1fffffffffcc000000003fffff000000f87fff7fffffff08000
+000003ffffc000000f00fff7fffffff18000000001ffffc0000007f85fffffffffb38000
+000000ffff80000007f803ffffffffae00000000007fff0000000ffeffffffffff800000
+0000003ff30000001fffffffffffff8000000000003f810000003ffffff7ffffff000000
+00000007810000007ffffffe1ffffe8000000000000388c000007fffffff0ffff8000000
+00000003f81000007ffffefe07c7f080000000000000fc0000007fffff7c0787e0800000
+000000001e0000007ffffff00701f080000000000000063800007ffffff8030170400000
+0000000003ff00003ffffff003810060000000000000007fe0001ffffff0008082000000
+00000000007ff000003fffe00003c60000000000000000fff800000fffc00001df100000
+0000000001fffc00001fff800000df8d00000000000001ffff80000fff0000006d87c000
+0000000000ffffc00007ff0000003801e0000000000000ffffc00007ff0000000c41f000
+00000000007fff800007ff000000000c800000000000007fff800007ff900000003ec000
+00000000003fff80000fff300000007fc00100000000000fff000007fe70000000ffe001
+00000000000fff000007fc70000003fff00000000000000ffe000007fc60000007fff800
+00000000001ff8000003fc00000007fff80000000000001ff8000003f800000003fffc00
+00000000001ff0000001f000000003fff80000000000001fe0000001e000000003c3f800
+00000000001fc0000000000000000001f00400000000003f80000000000000000000e007
+00000000003e00000000000000000000200c00000000003c000000000000000000002018
+00000000003c00000000000000000000001000000000003c000000000000000000000000
+00000000003800000000000000000000000000000000003c000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000001000000000000000000000000
+00000000000700000000000f007ffffff00000000000001f000000060fffffffffffff00
+00000001c03f00003ffffffffffffffffff00000ffffffff0003ffffffffffffffffffe0
+007ffffffffff01fffffffffffffffffffd0ffffffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+`.replace(/\s/g,"");
   const land=new Uint8Array(MW*MH);
   for(let i=0;i<HEX.length;i++){ const n=parseInt(HEX[i],16); land[i*4]=(n>>3)&1; land[i*4+1]=(n>>2)&1; land[i*4+2]=(n>>1)&1; land[i*4+3]=n&1; }
   const isLand=(x,y,z)=>{ const lon=Math.atan2(z,x), lat=Math.asin(Math.max(-1,Math.min(1,y))); let mx=Math.floor((lon+Math.PI)/(2*Math.PI)*MW), my=Math.floor((Math.PI/2-lat)/Math.PI*MH); mx=(mx%MW+MW)%MW; my=Math.max(0,Math.min(MH-1,my)); return land[my*MW+mx]; };

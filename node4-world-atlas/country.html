@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>세계 국가 도감</title>
-<script>if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark';</script>
+<title>World Atlas</title>
+<script>if(localStorage.getItem('theme')!=='light')document.documentElement.dataset.theme='dark';</script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
-  :root{--paper:#f4f2ea;--ink:#1c1b18;--muted:#8b8575;--faint:#b7b1a2;--line:#e2ded1;--card:#fbfaf4;--sel:#1c1b18;--star:#b5773a;--sans:'Noto Sans KR',sans-serif;--disp:'Space Grotesk','Noto Sans KR',sans-serif;--radius:14px}
-  html[data-theme="dark"]{--paper:#17150f;--ink:#ece7db;--muted:#9a9384;--faint:#6b6558;--line:#2e2a22;--card:#1e1b14;--sel:#ece7db;--star:#d69a52}
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,500&family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
+  :root{--paper:#f4f2ea;--ink:#1c1b18;--muted:#8b8575;--faint:#b7b1a2;--line:#e2ded1;--card:#fbfaf4;--sel:#1c1b18;--star:#b5773a;--sans:'Noto Sans KR',sans-serif;--disp:'Space Grotesk','Noto Sans KR',sans-serif;--serif:'Fraunces',Georgia,serif;--radius:14px}
+  html[data-theme="dark"]{--paper:#100f0c;--ink:#f0ebdf;--muted:#948d7e;--faint:#615b50;--line:#2a2620;--card:#191713;--sel:#f0ebdf;--star:#dda15e}
   .themebtn{border:1px solid var(--line);background:var(--card);border-radius:999px;width:32px;height:29px;font-size:.9rem;cursor:pointer;line-height:1;display:grid;place-items:center;transition:.15s;color:var(--ink)}
   .themebtn:hover{border-color:var(--ink)}
   *{box-sizing:border-box}
@@ -17,6 +17,7 @@
   .wrap{max-width:960px;margin:auto;padding:0 26px}
   /* top bar */
   .topbar{position:sticky;top:0;z-index:5;background:rgba(244,242,234,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  html[data-theme="dark"] .topbar{background:rgba(16,15,12,.9)}
   .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
   .back{font-family:var(--disp);font-size:.82rem;font-weight:700;letter-spacing:.04em;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
   .back:hover{color:var(--muted)}
@@ -49,6 +50,7 @@
   section.blk{padding:34px 0;border-bottom:1px solid var(--line)}
   .lbl{font-family:var(--disp);font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
   .lead-txt{font-size:1.18rem;line-height:1.7;letter-spacing:-.01em;max-width:60ch;font-weight:600}
+  html[lang="en"] .lead-txt{font-family:var(--serif);font-style:italic;font-weight:500;font-size:1.42rem;line-height:1.5}
   .about-txt{margin:18px 0 0;color:var(--muted);line-height:1.85;font-size:1rem;max-width:66ch;white-space:pre-wrap}
   .about-more{display:inline-block;margin-top:12px;font-family:var(--disp);font-size:.78rem;font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px}
   .about-more:hover{opacity:.6}
@@ -66,6 +68,7 @@
   .place{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start}
   .place .pimg{width:100%;aspect-ratio:4/3;border-radius:12px;background:var(--card) center/cover no-repeat;border:1px solid var(--line)}
   .place h3{margin:0 0 8px;font-size:1.35rem;font-weight:900;letter-spacing:-.01em}
+  html[lang="en"] .place h3{font-family:var(--serif);font-style:italic;font-weight:500;font-size:1.55rem}
   .place p{margin:0;color:var(--ink);line-height:1.75}
   .place .plink{font-family:var(--disp);font-size:.78rem;font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px;display:inline-block;margin-top:14px}
   .place .plink:hover{opacity:.6}
@@ -125,7 +128,7 @@
   <div id="app"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=44"></script>
+<script src="data.js?v=45"></script>
 <script>
 const code = new URLSearchParams(location.search).get('c');
 const c = code && countryByCode(code);
@@ -136,7 +139,7 @@ let THISVIEWS = null;   // 이 나라 조회수(백엔드)
 const $langsw = document.getElementById('langsw');
 $langsw.querySelectorAll("button").forEach(b => b.onclick = () => { if(b.dataset.l===LANG) return; setLang(b.dataset.l); rerender(); });
 const $themebtn = document.getElementById('themebtn');
-function applyTheme(){ const dark = localStorage.getItem('theme')==='dark'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; }
+function applyTheme(){ const dark = localStorage.getItem('theme')!=='light'; document.documentElement.dataset.theme = dark?'dark':''; $themebtn.textContent = dark?'☀️':'🌙'; }
 $themebtn.onclick = () => { localStorage.setItem('theme', localStorage.getItem('theme')==='dark'?'light':'dark'); applyTheme(); };
 applyTheme();
 function applyLangBits(){

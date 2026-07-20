@@ -145,7 +145,7 @@ const SEED_COMMENTS = {
 };
 
 // ===== 언어(i18n) =====
-let LANG = (localStorage.getItem('lang') === 'en') ? 'en' : 'ko';
+let LANG = (localStorage.getItem('lang') === 'ko') ? 'ko' : 'en';   // 기본값 영어(EN) — 저장된 값이 'ko'일 때만 한국어
 function setLang(l){ LANG = (l === 'en') ? 'en' : 'ko'; localStorage.setItem('lang', LANG); }
 function t(k){ return (I18N[LANG] && I18N[LANG][k] != null) ? I18N[LANG][k] : (I18N.ko[k] != null ? I18N.ko[k] : k); }
 // 나라별 현지화 접근자
@@ -165,7 +165,7 @@ const regionLabel = r => LANG==='en' ? (REGION_EN[r]||r) : r;
 const I18N = {
   ko: {
     docTitle:"세계 국가 도감", brand:"World Atlas · 세계 국가 도감",
-    mastTitle:"세계를,<br>한 장에 펼치다.",
+    mastTitle:"세계를,<br><em>한 장에 펼치다.</em>",
     mastSub:"40개국의 국기·수도·인구·면적·언어·종교·통화를 한 장에 담았습니다. 나라를 누르면 국기에 담긴 의미부터 대표 명소·여행 정보까지 이어지고, 가봤어요·가고싶어요 버튼과 댓글로 여행의 기억을 나눌 수 있어요. 오른쪽 지구본을 잡고 돌려보세요 — 세계가 손끝에서 움직입니다.",
     searchPh:"나라 이름으로 검색 (예: 프랑스, 브라질)", searchAria:"국가 검색",
     fav:"⭐ 즐겨찾기", popular:"🔥 인기순",
@@ -195,7 +195,7 @@ const I18N = {
   },
   en: {
     docTitle:"World Atlas", brand:"World Atlas",
-    mastTitle:"The World,<br>Unfolded.",
+    mastTitle:"The World,<br><em>Unfolded.</em>",
     mastSub:"Flags, capitals, population, area, languages, religion, and currency for 40 countries — gathered on a single page. Tap a country to dive into its story, from the meaning woven into its flag to landmarks and travel notes, and leave your mark with been-there, want-to-go, and comments. And go ahead — grab the globe and spin it. The world moves at your fingertips.",
     searchPh:"Search by country name (e.g. France, Brazil)", searchAria:"Search countries",
     fav:"⭐ Favorites", popular:"🔥 Popular",
