@@ -20,7 +20,8 @@
   /* masthead */
   header.mast{padding:48px 0 32px;border-bottom:1px solid var(--line)}
   header.mast .wrap{position:relative}
-  #globe{position:absolute;top:84px;right:-6px;width:360px;height:360px;pointer-events:none;z-index:0}
+  #globe{position:absolute;top:84px;right:-6px;width:360px;height:360px;z-index:1;cursor:grab;touch-action:none}
+  #globe:active{cursor:grabbing}
   @media(max-width:1000px){ #globe{width:260px;height:260px;top:64px;opacity:.5} }
   @media(max-width:720px){ #globe{display:none} }
   .mast-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
@@ -293,27 +294,37 @@ initAuth();
   const land=new Uint8Array(MW*MH);
   for(let i=0;i<HEX.length;i++){ const n=parseInt(HEX[i],16); land[i*4]=(n>>3)&1; land[i*4+1]=(n>>2)&1; land[i*4+2]=(n>>1)&1; land[i*4+3]=n&1; }
   const isLand=(x,y,z)=>{ const lon=Math.atan2(z,x), lat=Math.asin(Math.max(-1,Math.min(1,y))); let mx=Math.floor((lon+Math.PI)/(2*Math.PI)*MW), my=Math.floor((Math.PI/2-lat)/Math.PI*MH); mx=(mx%MW+MW)%MW; my=Math.max(0,Math.min(MH-1,my)); return land[my*MW+mx]; };
-  const M=6000, dots=[];
+  const M=6500, dots=[];
   for(let i=0;i<M;i++){ const y=1-(i/(M-1))*2; const r=Math.sqrt(Math.max(0,1-y*y)); const th=i*2.399963; const x=Math.cos(th)*r, z=Math.sin(th)*r; const L=isLand(x,y,z); dots.push([x,y,z,L,(L&&i%53===0)]); }
-  const tilt=-0.34, ct=Math.cos(tilt), st=Math.sin(tilt);
   const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   let ink=cssVar('--ink')||'#1c1b18', star=cssVar('--star')||'#b5773a';
   window.__globeTheme = () => { ink=cssVar('--ink')||ink; star=cssVar('--star')||star; };
   let DPR=1, CW=0, CH=0, R=0, cx=0, cy=0;
-  function resize(){ const s=cv.clientWidth||0; DPR=Math.min(window.devicePixelRatio||1,2); cv.width=s*DPR; cv.height=s*DPR; CW=cv.width; CH=cv.height; R=CW*0.44; cx=CW/2; cy=CH/2; }
+  function resize(){ const s=cv.clientWidth||0; DPR=Math.min(window.devicePixelRatio||1,2); cv.width=s*DPR; cv.height=s*DPR; CW=cv.width; CH=cv.height; R=CW*0.46; cx=CW/2; cy=CH/2; }
   resize(); addEventListener('resize', resize);
-  let a=0;
+  // ===== 상호작용: 드래그로 돌리고, 놓으면 축 복귀 후 자전 =====
+  const TILT=-0.34, autoV=reduce?0.0006:0.0015;
+  let angY=0, angX=TILT, dragging=false, lastX=0, lastY=0;
+  const pt = e => e.touches && e.touches[0] ? e.touches[0] : e;
+  function down(e){ dragging=true; const p=pt(e); lastX=p.clientX; lastY=p.clientY; if(e.cancelable)e.preventDefault(); }
+  function move(e){ if(!dragging) return; const p=pt(e); angY+=(p.clientX-lastX)*0.006; angX+=(p.clientY-lastY)*0.006; angX=Math.max(-1.35,Math.min(1.35,angX)); lastX=p.clientX; lastY=p.clientY; if(e.cancelable)e.preventDefault(); }
+  function up(){ dragging=false; }
+  cv.addEventListener('pointerdown',down); addEventListener('pointermove',move); addEventListener('pointerup',up); addEventListener('pointercancel',up);
+  cv.addEventListener('touchstart',down,{passive:false}); addEventListener('touchmove',move,{passive:false}); addEventListener('touchend',up);
   function frame(){
-    if(CW){ ctx.clearRect(0,0,CW,CH); const ca=Math.cos(a), sa=Math.sin(a);
+    if(CW){ ctx.clearRect(0,0,CW,CH);
+      if(!dragging){ angY+=autoV; angX+=(TILT-angX)*0.06; }   // 놓으면 자전 축으로 부드럽게 복귀
+      const ca=Math.cos(angY), sa=Math.sin(angY), ct=Math.cos(angX), st=Math.sin(angX);
       for(const p of dots){
         const x=p[0]*ca - p[2]*sa, z=p[0]*sa + p[2]*ca, y=p[1];
-        const y2=y*ct - z*st, z2=y*st + z*ct, depth=(z2+1)/2;
-        if(p[3]){ ctx.globalAlpha=0.16+depth*0.72; ctx.fillStyle=p[4]?star:ink; ctx.beginPath(); ctx.arc(cx+x*R, cy+y2*R, (0.6+depth*1.2)*DPR, 0, 6.2832); ctx.fill(); }
-        else { ctx.globalAlpha=0.05+depth*0.11; ctx.fillStyle=ink; ctx.beginPath(); ctx.arc(cx+x*R, cy+y2*R, (0.4+depth*0.6)*DPR, 0, 6.2832); ctx.fill(); }
+        const y2=y*ct - z*st, z2=y*st + z*ct;
+        if(z2 < -0.05) continue;               // 뒷면 컬링 → 앞 대륙만 선명
+        const depth=(z2+1)/2;
+        if(p[3]){ ctx.globalAlpha=Math.min(1,0.34+depth*0.66); ctx.fillStyle=p[4]?star:ink; ctx.beginPath(); ctx.arc(cx-x*R, cy+y2*R, (0.7+depth*1.1)*DPR, 0, 6.2832); ctx.fill(); }
+        else { ctx.globalAlpha=0.06+depth*0.12; ctx.fillStyle=ink; ctx.beginPath(); ctx.arc(cx-x*R, cy+y2*R, (0.4+depth*0.55)*DPR, 0, 6.2832); ctx.fill(); }
       }
       ctx.globalAlpha=1;
     }
-    a += reduce?0.0006:0.0016;
     requestAnimationFrame(frame);
   }
   frame();
